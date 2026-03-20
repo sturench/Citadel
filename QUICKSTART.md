@@ -9,6 +9,7 @@ From install to first `/do` command in 5 minutes.
 
 ## 1. Copy the harness into your project
 
+### macOS / Linux
 ```bash
 git clone https://github.com/SethGammon/Citadel.git
 cd your-project
@@ -22,6 +23,28 @@ cp -r ../Citadel/scripts .
 cp ../Citadel/CLAUDE.md .
 ```
 
+### Windows (Command Prompt)
+```cmd
+git clone https://github.com/SethGammon/Citadel.git
+cd your-project
+
+xcopy /E /I ..\Citadel\.claude .\.claude
+xcopy /E /I ..\Citadel\.planning .\.planning
+xcopy /E /I ..\Citadel\scripts .\scripts
+xcopy ..\Citadel\CLAUDE.md .\CLAUDE.md*
+```
+
+### Windows (PowerShell)
+```powershell
+git clone https://github.com/SethGammon/Citadel.git
+cd your-project
+
+Copy-Item -Recurse ..\Citadel\.claude .\.claude
+Copy-Item -Recurse ..\Citadel\.planning .\.planning
+Copy-Item -Recurse ..\Citadel\scripts .\scripts
+Copy-Item ..\Citadel\CLAUDE.md .\CLAUDE.md
+```
+
 > **Note:** If your project already has a `.gitignore`, append the entries from the harness `.gitignore` rather than overwriting yours.
 
 Or copy manually — the harness is just files, no build step.
@@ -29,12 +52,12 @@ Or copy manually — the harness is just files, no build step.
 ## 2. Run setup
 
 Open your project in Claude Code (`cd your-project && claude`), then:
-
 ```
 /do setup
 ```
 
 This will:
+
 - Detect your language and framework
 - Configure the typecheck hook for your stack
 - Generate `.claude/harness.json` with your settings
@@ -42,7 +65,6 @@ This will:
 - Run a quick demo on your code
 
 ## 3. Start using it
-
 ```
 /do review src/main.ts          # Code review
 /do generate tests for utils    # Test generation
@@ -51,7 +73,6 @@ This will:
 ```
 
 Or let the router figure it out:
-
 ```
 /do fix the login bug
 /do what's wrong with the API
@@ -59,13 +80,11 @@ Or let the router figure it out:
 ```
 
 ## 4. Create your first custom skill
-
 ```
 /create-skill
 ```
 
-It'll ask what patterns you keep repeating and generate a skill file
-that captures your knowledge permanently.
+It'll ask what patterns you keep repeating and generate a skill file that captures your knowledge permanently.
 
 ## What's Next
 
