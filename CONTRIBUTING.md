@@ -83,6 +83,35 @@ citadel/
   docs/                 # Reference documentation
 ```
 
+## Opt-in Hooks
+
+Some hooks are not wired in the plugin's `hooks/hooks.json` by default. They are available in `hooks_src/` for users who want them:
+
+- **`external-action-gate.js`** — Blocks git push, PR creation, issue comments, and other external actions until the user approves. Add to your project's `.claude/settings.local.json`:
+  ```json
+  {
+    "hooks": {
+      "PreToolUse": [{
+        "matcher": "Bash",
+        "hooks": [{ "type": "command", "command": "node '${CLAUDE_PLUGIN_ROOT}/hooks_src/external-action-gate.js'", "timeout": 5 }]
+      }]
+    }
+  }
+  ```
+
+- **`issue-monitor.js`** — Checks for new GitHub issues on session start. Add to `.claude/settings.local.json`:
+  ```json
+  {
+    "hooks": {
+      "SessionStart": [{
+        "hooks": [{ "type": "command", "command": "node '${CLAUDE_PLUGIN_ROOT}/hooks_src/issue-monitor.js'", "timeout": 20 }]
+      }]
+    }
+  }
+  ```
+
+> **Migrating from copy-based install?** These hooks previously lived at `.claude/hooks/`. The paths in your `settings.local.json` need to change from `node .claude/hooks/external-action-gate.js` to the `${CLAUDE_PLUGIN_ROOT}` form shown above.
+
 ## Code Style
 
 - Node.js scripts use CommonJS (`require`), not ESM

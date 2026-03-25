@@ -124,6 +124,59 @@ your-project/
     agent-context/        # Rules injected into sub-agents
 ```
 
+## Migrating from copy-based install
+
+If you previously installed Citadel by copying `.claude/`, `.planning/`, and `scripts/` into your project, follow these steps to switch to the plugin.
+
+### 1. Back up your project config
+
+These files are project-specific and should be kept:
+
+```bash
+# Keep these — they contain your project's state
+# .claude/harness.json     (project config from /do setup)
+# .planning/               (campaign state, fleet sessions, telemetry)
+# .claude/settings.local.json  (your personal hook config, if any)
+```
+
+### 2. Remove the copied harness files
+
+```bash
+# Remove Citadel's copied files (NOT your project config)
+rm -rf .claude/hooks/        # Hooks now live in the plugin
+rm -rf .claude/skills/       # Built-in skills now live in the plugin
+rm -rf .claude/agents/       # Agents now live in the plugin
+rm -rf scripts/              # Utility scripts are now synced to .citadel/scripts/
+rm -f .claude/settings.json  # Hook config is now in the plugin's hooks/hooks.json
+```
+
+Keep `.claude/harness.json` — it has your project's stack config. Keep `.planning/` — it has your campaign history.
+
+### 3. Install the plugin
+
+```bash
+git clone https://github.com/SethGammon/Citadel.git
+```
+
+In Claude Code:
+```
+/plugin marketplace add /path/to/Citadel
+/plugin install citadel@citadel-local
+```
+
+### 4. Update settings.local.json (if applicable)
+
+If you had opt-in hooks in `.claude/settings.local.json`, update the paths:
+
+| Before (copy-based) | After (plugin) |
+|---|---|
+| `node .claude/hooks/external-action-gate.js` | `node '${CLAUDE_PLUGIN_ROOT}/hooks_src/external-action-gate.js'` |
+| `node .claude/hooks/issue-monitor.js` | `node '${CLAUDE_PLUGIN_ROOT}/hooks_src/issue-monitor.js'` |
+
+### 5. Start a new session
+
+The `init-project` hook will auto-scaffold `.citadel/scripts/` and verify your `.planning/` directory on session start. Run `/do setup` to regenerate `harness.json` if needed.
+
 ## Telemetry
 
 The harness logs agent events, hook timing, and discovery compression to `.planning/telemetry/` (JSONL format, never leaves your machine).
