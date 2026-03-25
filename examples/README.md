@@ -16,7 +16,7 @@ A completed campaign file showing Archon's multi-phase execution model. This exa
 - Active Context and Continuation State for cross-session persistence
 
 **How to use it:**
-1. Read it alongside the Archon skill definition at `.claude/skills/archon/SKILL.md`
+1. Read it alongside the Archon skill definition at `skills/archon/SKILL.md`
 2. Compare its structure to the campaign template at `.planning/_templates/campaign.md`
 3. Use it as a reference when creating your own campaigns — the format is the contract that Archon reads and writes
 
