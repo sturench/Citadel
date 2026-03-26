@@ -38,7 +38,24 @@ function resolveHooks() {
   const resolved = raw.replace(/\$\{CLAUDE_PLUGIN_ROOT\}/g, citadelPath);
   // Also strip single quotes that wrapped the variable (leftover from plugin convention)
   const cleaned = resolved.replace(/node\s+'([^']+)'/g, 'node "$1"');
-  return JSON.parse(cleaned);
+  const hooks = JSON.parse(cleaned);
+
+  // Quote script paths that contain spaces (Windows installs with spaces in directory names)
+  for (const entries of Object.values(hooks.hooks)) {
+    for (const entry of entries) {
+      if (!entry.hooks) continue;
+      for (const hook of entry.hooks) {
+        if (hook.command) {
+          hook.command = hook.command.replace(/^node\s+(.+)$/, (_, script) => {
+            if (script.includes(' ') && !script.startsWith('"')) return `node "${script}"`;
+            return `node ${script}`;
+          });
+        }
+      }
+    }
+  }
+
+  return hooks;
 }
 
 function readExistingSettings() {
