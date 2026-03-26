@@ -3,6 +3,13 @@ name: arch-reviewer
 description: >-
   Read-only architecture reviewer. Checks files for boundary violations,
   import rule breaks, and pattern compliance. Does not modify files.
+maxTurns: 50
+effort: medium
+disallowedTools:
+  - Edit
+  - Write
+  - Bash
+  - NotebookEdit
 tools:
   - Read
   - Grep

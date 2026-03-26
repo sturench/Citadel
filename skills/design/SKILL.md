@@ -25,6 +25,26 @@ It's not a design system generator. It's a pattern extractor and enforcer.
 - When visual inconsistency is noticed ("why do we have 4 different button styles?")
 - When /do routes "design", "style guide", "visual consistency", "design manifest"
 
+## Protocol
+
+### Step 1: DETECT MODE
+
+Check for existing styles: look for `tailwind.config.*`, global CSS files, or component files with style patterns. If any exist, use Extract Mode. If none exist or the user says "new project", use Generate Mode.
+
+### Step 2: GATHER INPUT
+
+**Extract Mode**: Read style sources (tailwind config, global CSS, component files). Present findings to user and confirm before writing.
+
+**Generate Mode**: Ask up to 4 questions about feel, color mode, brand colors, and layout density. Use sensible defaults for anything not specified.
+
+### Step 3: WRITE MANIFEST
+
+Write to `.planning/design-manifest.md` using the template defined below. Every section must have real values — no placeholders.
+
+### Step 4: CONFIRM
+
+Present a summary of the manifest to the user: "Here's your design manifest. It will be used by the post-edit hook to flag deviations. Anything to change?"
+
 ## Modes
 
 ### Extract Mode (existing project has styles)
@@ -170,3 +190,25 @@ Rules for the hook:
 - Extract mode cites which files the values came from
 - Generate mode defaults are sensible (not random)
 - Anti-patterns section is populated based on the manifest values
+
+## Fringe Cases
+
+**No styles exist and user hasn't specified preferences**: Default to Generate Mode. Use sensible defaults (minimal feel, light mode, neutral palette) and present the manifest for review before writing.
+
+**Tailwind config exists but no custom theme**: Extract what's available (font, breakpoints), note which sections use Tailwind defaults, and generate the rest.
+
+**If .planning/ does not exist**: Create it before writing the manifest. If not possible, output the manifest inline and instruct the user to save it or run `/do setup`.
+
+**User says "update the manifest"**: Re-run Extract Mode on the current codebase, diff against the existing manifest, and present only what has changed.
+
+## Exit Protocol
+
+```
+---HANDOFF---
+- Design manifest: .planning/design-manifest.md
+- Mode: {extracted | generated}
+- Sources: {files read, or "user preferences"}
+- Anti-patterns documented: {count}
+- Next: Post-edit hook will flag deviations automatically
+---
+```

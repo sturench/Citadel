@@ -193,7 +193,14 @@ function main() {
     process.exit(1);
   }
 
-  console.log('All hooks are healthy.\n');
+  console.log('All hooks are healthy.');
+  console.log('');
+  console.log('Other test commands:');
+  console.log('  node scripts/skill-lint.js          lint all SKILL.md files');
+  console.log('  node scripts/skill-bench.js         validate benchmark scenarios');
+  console.log('  node scripts/skill-bench.js --execute  run scenarios against claude');
+  console.log('  node scripts/test-all.js            hooks + skills (fast, no claude)');
+  console.log('');
   process.exit(0);
 }
 

@@ -191,6 +191,27 @@ The PRD is not the build. The PRD is the input to the build.
 - Out of Scope section exists and has at least 2 items
 - No more than 5 core features for v1
 
+## Fringe Cases
+
+**Vague description**: If the user's description is too vague to infer end conditions, ask up to 3 clarifying questions. Don't produce a PRD with placeholder end conditions.
+
+**Feature mode but no existing code found**: Confirm with the user — "I don't see existing source files. Is this a new project?" Then switch to greenfield mode if confirmed.
+
+**User says "skip the PRD"**: Inform them that even a minimal PRD is needed for Archon to operate. Offer to produce a 1-page express PRD with minimal questions (Tier 4 style).
+
+**If .planning/ does not exist**: Create it before writing the PRD. If not possible, present the PRD inline and suggest the user run `/do setup` first.
+
+## Exit Protocol
+
+```
+---HANDOFF---
+- PRD: {app name}
+- Document: .planning/prd-{slug}.md
+- Status: {approved | needs-revision}
+- Next: Run `/do build {app name}` or `/archon` with the PRD as direction
+---
+```
+
 ## Stack Selection Principles
 
 Don't lock to one stack. But do make opinionated recommendations:

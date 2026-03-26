@@ -109,6 +109,12 @@ function main() {
   const existing = readExistingSettings();
   const merged = mergeHooks(existing, citadelHooks);
 
+  // Inject security env defaults (preserve any user-set env vars)
+  merged.env = merged.env || {};
+  if (!('CLAUDE_CODE_SUBPROCESS_ENV_SCRUB' in merged.env)) {
+    merged.env.CLAUDE_CODE_SUBPROCESS_ENV_SCRUB = '1';
+  }
+
   // Write
   fs.writeFileSync(SETTINGS_PATH, JSON.stringify(merged, null, 2) + '\n');
 

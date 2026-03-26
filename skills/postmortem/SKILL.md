@@ -151,6 +151,13 @@ Write to `.planning/postmortems/postmortem-{slug}-{date}.md`:
 ---
 ```
 
+After displaying the HANDOFF block, output the following prompt to the user:
+
+```
+Run /learn after reviewing this postmortem to extract patterns into the knowledge base:
+  /learn {campaign-slug}
+```
+
 ## What /postmortem Does NOT Do
 
 - Invent failures that didn't happen (real data only)
@@ -164,3 +171,27 @@ Write to `.planning/postmortems/postmortem-{slug}-{date}.md`:
 - Numbers section has real data (not estimates)
 - Recommendations are concrete actions (not "be more careful")
 - If no failures occurred, say so honestly (don't manufacture drama)
+
+## Fringe Cases
+
+**Campaign not found**: If the specified campaign file doesn't exist, check `.planning/campaigns/` for the most recently modified campaign. If no campaigns exist, run in ad-hoc mode using recent git history and session context.
+
+**No telemetry data**: Proceed without telemetry. Mark the "What Safety Systems Caught" table as "No telemetry available" and the Numbers section fields as "N/A". Don't manufacture data.
+
+**Partial campaign** (parked or in-progress): Generate the postmortem with `Outcome: partial`. Document what was completed and what was parked. Include a "Remaining Work" section listing incomplete phases.
+
+**If .planning/postmortems/ does not exist**: Create it before writing. If `.planning/` itself doesn't exist, output the postmortem inline and note: "Run /do setup to initialize .planning/ for future storage."
+
+## Exit Protocol
+
+```
+---HANDOFF---
+- Postmortem: {name}
+- Document: .planning/postmortems/postmortem-{slug}-{date}.md
+- Failures documented: {count}
+- Safety catches: {count}
+- Recommendations: {count}
+---
+```
+
+After displaying the HANDOFF block, suggest: `Run /learn {campaign-slug} to extract patterns into the knowledge base.`

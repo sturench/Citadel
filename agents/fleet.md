@@ -6,6 +6,8 @@ description: >-
   shares context between waves, rebalances priorities. Does not write code —
   reads, plans, spawns, reviews, coordinates.
 model: opus
+maxTurns: 150
+effort: high
 tools:
   - Read
   - Write

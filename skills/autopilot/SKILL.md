@@ -92,6 +92,14 @@ target: src/path/to/affected/area/
 Description of what needs to be done...
 ```
 
+## Fringe Cases
+
+- **`.planning/intake/` is empty or does not exist**: Output "Nothing to process — `.planning/intake/` is empty. Drop a file there or run `/do setup` to initialize." Do not error.
+- **Intake item has no clear action**: If the description is too vague to execute, ask the user one clarifying question or skip the item with a note: "Skipped — direction unclear. Update the intake file and re-run."
+- **Item status is unrecognized**: Treat unknown statuses as `pending` and proceed through the brief → build flow.
+- **Typecheck fails during build**: Record the failure in the item's status, move on to the next item, and report the blocker in the exit summary.
+- **`.planning/` does not exist**: Output a setup hint and exit cleanly. Autopilot requires `.planning/intake/` to operate — if the directory is absent, treat as empty intake and suggest running `/do setup`.
+
 ## Quality Gates
 
 - Never build without reading CLAUDE.md first

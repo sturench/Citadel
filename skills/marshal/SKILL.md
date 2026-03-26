@@ -130,6 +130,14 @@ Fleet uses). If an agent exceeds its timeout:
 Never wait indefinitely. A timed-out agent's scope becomes a "gap" in the
 Marshal Report's Findings section.
 
+## Fringe Cases
+
+- **Direction is vague** (e.g., "do the thing", "fix it", "make it better"): Ask one clarifying question before proceeding. Do not attempt to guess scope on truly ambiguous input — one focused question is cheaper than executing the wrong plan.
+- **A sub-task fails on first attempt**: Retry once with a different approach (narrower scope, different tool, simpler method). If the second attempt also fails, record the blocker in the report and move on.
+- **No relevant files found for the stated scope**: Report the empty result honestly. Do not fabricate findings. Suggest the user verify the scope or file paths.
+- **CLAUDE.md missing**: Proceed without it. Note the absence in the report so the user knows project conventions weren't applied.
+- **Typecheck not configured**: Skip the verification step and note it as "unverified" in the report rather than blocking completion.
+
 ## Quality Gates
 
 - Every finding must cite a specific file and line number

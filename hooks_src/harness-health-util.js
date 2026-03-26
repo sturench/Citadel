@@ -13,6 +13,14 @@ const path = require('path');
 const PROJECT_ROOT = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 const TELEMETRY_DIR = path.join(PROJECT_ROOT, '.planning', 'telemetry');
 const HOOK_TIMING_FILE = path.join(TELEMETRY_DIR, 'hook-timing.jsonl');
+const AUDIT_LOG_FILE = path.join(TELEMETRY_DIR, 'audit.jsonl');
+
+/**
+ * Plugin-scoped data directory for mutable state that survives plugin updates.
+ * Uses CLAUDE_PLUGIN_DATA env var when available (Claude Code >= recent release).
+ * Falls back to .claude/ in the project root for backward compatibility.
+ */
+const PLUGIN_DATA_DIR = process.env.CLAUDE_PLUGIN_DATA || path.join(PROJECT_ROOT, '.claude');
 
 /**
  * Ensure telemetry directory exists.
@@ -81,6 +89,19 @@ function readConfig() {
     qualityRules: { builtIn: [], custom: [] },
     protectedFiles: ['.claude/harness.json'],
     features: { intakeScanner: true, telemetry: true },
+    policy: {
+      scopeEnforcement: 'warn',   // 'warn' | 'block' | 'off'
+      auditLog: true,
+      allowedOutOfScopeTools: [], // tools exempt from scope warnings
+    },
+    preCompact: {
+      handoffMode: 'auto',        // 'auto' | 'prompt' | 'off'
+    },
+    docs: {
+      auto: true,                 // false to disable automatic doc sync
+      audiences: ['user', 'org', 'agents'],
+      exclude: [],
+    },
   };
 }
 
@@ -219,10 +240,32 @@ function securityWarning(hook, message) {
   increment(hook, 'security-warning');
 }
 
+/**
+ * Append an entry to the immutable audit log.
+ * The audit log is append-only — never truncated, never overwritten.
+ * Records significant agent actions, policy violations, and system events.
+ *
+ * @param {string} event - Event type (e.g., 'scope-violation', 'subagent-stop', 'worktree-removed')
+ * @param {object} data - Structured data for the event
+ */
+function writeAuditLog(event, data = {}) {
+  ensureTelemetryDir();
+  try {
+    const entry = JSON.stringify({
+      event,
+      timestamp: new Date().toISOString(),
+      project: path.basename(PROJECT_ROOT),
+      ...data,
+    });
+    fs.appendFileSync(AUDIT_LOG_FILE, entry + '\n', 'utf8');
+  } catch { /* audit log should never break a hook */ }
+}
+
 module.exports = {
   increment,
   logTiming,
   logBlock,
+  writeAuditLog,
   readConfig,
   detectStack,
   getTypecheckConfig,
@@ -231,4 +274,5 @@ module.exports = {
   securityWarning,
   PROJECT_ROOT,
   TELEMETRY_DIR,
+  PLUGIN_DATA_DIR,
 };

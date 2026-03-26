@@ -209,6 +209,49 @@ The installer:
 After running, verify hooks are active by checking `.claude/settings.json` exists
 and contains hook definitions with absolute paths to Citadel's `hooks_src/` directory.
 
+### Step 2b: OPTIONAL INTEGRATIONS
+
+After generating harness.json, offer two optional integrations. These are
+quick yes/no prompts — don't block setup if the user skips them.
+
+---
+
+**Optional: GitHub Integration**
+
+Ask: "Would you like to set up GitHub integration? This installs the Claude
+GitHub App and scaffolds a workflow so @claude can be mentioned in issues and
+PRs. (recommended)"
+
+If yes:
+1. Run `/install-github-app` (or direct the user to install from https://github.com/apps/claude)
+2. Create `.github/workflows/` in the project root if it doesn't exist
+3. Copy `.planning/_templates/claude-triage.yml` to `.github/workflows/claude-triage.yml`
+   - If the file already exists: skip and note "claude-triage.yml already present"
+4. Copy `.planning/_templates/REVIEW.md` to `REVIEW.md` in the project root
+   - If REVIEW.md already exists: skip and note "REVIEW.md already present"
+5. Output: "GitHub integration ready. Add `ANTHROPIC_API_KEY` to your repo's
+   GitHub Actions secrets (Settings > Secrets > Actions) to activate."
+
+If no: "Skipped. You can set this up later with `/install-github-app`."
+
+---
+
+**Optional: MCP Server Config**
+
+Ask: "Would you like to scaffold an MCP server configuration? This creates
+a `.mcp.json` with common servers pre-configured (GitHub, filesystem, git).
+All servers are commented out — you enable only what you need. (recommended for teams)"
+
+If yes:
+1. Copy `.planning/_templates/.mcp.json` to `.mcp.json` in the project root
+   - If `.mcp.json` already exists: skip and note ".mcp.json already present"
+2. Output: "`.mcp.json` created. Edit it to uncomment the servers you want.
+   See https://registry.modelcontextprotocol.io for available servers."
+
+If no: "Skipped. You can create `.mcp.json` manually at any time."
+
+---
+
 ### Step 3: DEMONSTRATE (run one real task)
 
 Pick a demo task based on the user's pain point:

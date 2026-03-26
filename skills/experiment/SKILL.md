@@ -109,6 +109,13 @@ Also log to `.planning/telemetry/agent-runs.jsonl`:
 | Reduce file count | `find src -name '*.ts' \| wc -l` |
 | Reduce line count | `wc -l src/**/*.ts \| tail -1 \| awk '{print $1}'` |
 
+## When to Use
+
+- When you want to optimize a measurable metric (bundle size, error count, test coverage, FPS)
+- When you have a clear hypothesis but aren't sure which of several approaches wins
+- When manual A/B testing would be too slow or error-prone
+- NOT when the goal is subjective ("make it feel better") — the metric must be a number
+
 ## Safety Rules
 
 - NEVER modify files outside scope
@@ -116,6 +123,24 @@ Also log to `.planning/telemetry/agent-runs.jsonl`:
 - ALWAYS run typecheck before keeping a change
 - Restore stashed changes on exit (even on error)
 - If the metric command fails, treat as DISCARD (not crash)
+
+## Quality Gates
+
+- Baseline was measured before any iterations ran
+- Every kept iteration improved the metric AND passed typecheck
+- Every discarded iteration has a logged reason
+- The stop reason is one of: convergence, diminishing returns, or budget exhausted
+- The experiment report exists at `.planning/research/experiment-{slug}.md` with all iteration rows filled
+
+## Fringe Cases
+
+**Metric command outputs nothing or non-numeric text**: Treat as a metric failure. Ask the user to provide a command that outputs a single number to stdout before starting iterations.
+
+**No worktree support** (e.g., shallow clone): Fall back to branch isolation. Create a branch, run changes there, measure, then delete or merge the branch. Never modify the working tree directly.
+
+**If .planning/research/ does not exist**: Create it before writing the experiment report. If `.planning/` itself doesn't exist, create the full path or output the report inline.
+
+**Budget exhausted with zero kept iterations**: Report outcome as "no improvement found". This is a valid result — do not continue past the budget.
 
 ## Exit Protocol
 

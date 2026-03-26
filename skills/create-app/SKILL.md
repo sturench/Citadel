@@ -198,3 +198,28 @@ All of Archon's existing safety applies. Additionally:
 - Every campaign phase has machine-verifiable end conditions
 - Final verification checks all PRD end conditions
 - User receives a clear report of what was built and what needs attention
+
+## Fringe Cases
+
+**No PRD and vague requirements**: Even in Tier 4, a minimal PRD is generated. If the description is too vague, default to Tier 2 (guided) and ask clarifying questions before producing the PRD.
+
+**Project already initialized**: Detect existing source files (src/, app/, package.json with deps). Automatically classify as Tier 5 (Feature Addition). Do not scaffold over an existing project.
+
+**If .planning/ does not exist**: /prd and /architect will need to create it. If the directory cannot be created, present the PRD and architecture inline and ask the user to run `/do setup` first.
+
+**Tier misclassification**: If the user corrects the tier ("just build it" → Tier 4, "walk me through it" → Tier 2), switch immediately without re-reading the input.
+
+## Exit Protocol
+
+After the campaign completes and verification runs, output:
+
+```
+---HANDOFF---
+- App: {name}
+- Built: {feature ledger summary}
+- Verified: {N}/{total} end conditions passed
+- Status: {complete | partial | failed}
+- To run: {start command}
+- Next: {suggested next step, e.g., /postmortem or deploy command}
+---
+```

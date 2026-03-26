@@ -4,6 +4,14 @@ description: >-
   Extracts reusable patterns, pitfalls, and decisions from completed
   work into the project's knowledge base. Run after finishing a body
   of work to capture what was learned.
+maxTurns: 30
+effort: low
+disallowedTools:
+  - Bash
+  - WebSearch
+  - WebFetch
+  - Agent
+  - NotebookEdit
 tools:
   - Read
   - Write

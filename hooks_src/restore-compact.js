@@ -13,16 +13,24 @@ const path = require('path');
 const health = require('./harness-health-util');
 
 const PROJECT_ROOT = health.PROJECT_ROOT;
-const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'compact-state.json');
+const PLUGIN_DATA_DIR = health.PLUGIN_DATA_DIR;
+// Check both PLUGIN_DATA_DIR (new) and .claude/ (legacy) for backward compatibility
+const STATE_FILE = path.join(PLUGIN_DATA_DIR, 'compact-state.json');
+const LEGACY_STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'compact-state.json');
 
 function main() {
-  if (!fs.existsSync(STATE_FILE)) {
+  // Try PLUGIN_DATA_DIR first, fall back to legacy .claude/ location
+  const stateFile = fs.existsSync(STATE_FILE) ? STATE_FILE
+    : fs.existsSync(LEGACY_STATE_FILE) ? LEGACY_STATE_FILE
+    : null;
+
+  if (!stateFile) {
     process.exit(0);
   }
 
   let state;
   try {
-    state = JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
+    state = JSON.parse(fs.readFileSync(stateFile, 'utf8'));
   } catch {
     process.exit(0);
   }

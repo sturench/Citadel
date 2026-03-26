@@ -30,7 +30,7 @@ under-routing (skill fails, user re-invokes) is far cheaper than over-routing
 | Command | Behavior |
 |---|---|
 | `/do [anything]` | Classify intent, route to cheapest capable path |
-| `/do status` | Show active campaigns, fleet sessions, pending intake |
+| `/do status` | Show full harness dashboard (/dashboard) |
 | `/do continue` | Resume most recent active campaign or fleet session |
 | `/do --list` | Show all skills grouped by category with trigger keywords |
 | `/do setup` | First-run experience — configure the harness for this project |
@@ -70,12 +70,13 @@ Regex/keyword on raw input. Catches trivial commands:
 | "typecheck" or "type check" | Run the project's typecheck command |
 | "build" | Run the project's build command |
 | "test" or "tests" | Run the project's test command |
-| "status" | Show active campaigns, fleet sessions, pending intake |
+| "status", "dashboard", "what's happening", "what's going on", "show activity" | Show full harness dashboard (/dashboard) |
 | "continue" or "keep going" | Resume active campaign or fleet session |
 | "setup" | Run `/do setup` first-run experience |
 | "--list" or "list" | Show all available skills |
 | "fix typo in X" or "rename X to Y" | Direct edit (no orchestrator needed) |
 | "commit" | Stage and commit changes |
+| "rollback", "undo phase", "restore checkpoint" | Find active campaign, read latest checkpoint ref, run git stash pop |
 
 If matched → execute directly. Done.
 
@@ -124,6 +125,13 @@ and any project-level custom skills in `.claude/skills/`.
 | "postmortem", "retro", "what broke", "what happened", "debrief" | `/postmortem` |
 | "design", "style guide", "design manifest", "visual consistency" | `/design` |
 | "qa", "test the app", "click through", "does it work", "browser test" | `/qa` |
+| "triage", "open issues", "unlabeled issues", "review pr", "review prs", "investigate issue" | `/triage` |
+| "watch pr", "watch ci", "monitor pr", "fix ci", "ci failing", "pr failing", "auto-fix", "auto fix pr", "pr is red", "checks failing" | `/pr-watch` |
+| "dashboard", "what's happening", "what's going on", "show activity", "harness state", "show me status" | `/dashboard` |
+| "learn", "extract patterns", "learn from that", "save what worked", "patterns from campaign" | `/learn` |
+| "schedule", "recurring", "every N minutes", "cron", "set a reminder", "run periodically" | `/schedule` |
+| "merge review", "check merges", "any conflicts", "fleet conflicts", "pending branches", "safe to merge" | `/merge-review` |
+| "ascii diagram", "ascii art", "box diagram", "architecture diagram", "flow diagram", "draw a diagram", "text diagram", "sequence diagram" | `/ascii-diagram` |
 
 If ONE skill matches with high confidence → invoke it directly. Done.
 If MULTIPLE skills match → fall through to Tier 3.
@@ -172,26 +180,9 @@ is a skill waiting to be extracted.
 
 ## /do status
 
-Show the current state of the harness:
-
-```
-=== Harness Status ===
-
-Campaigns:
-  {slug}: {status} — Phase {N}/{total} — {direction summary}
-  (none active)
-
-Fleet Sessions:
-  {slug}: {status} — Wave {N} — {agents} agents
-  (none active)
-
-Intake:
-  {N} pending items in .planning/intake/
-  Run /autopilot to process them.
-
-Skills: {N} installed (Citadel plugin + .claude/skills/)
-Hooks: {N} active (Citadel plugin)
-```
+Routes directly to `/dashboard`. `/do status` is an alias — invoke `/dashboard`
+and display its full output. See `skills/dashboard/SKILL.md` for the complete
+protocol and output format.
 
 ## /do --list
 
@@ -232,9 +223,21 @@ QUALITY & VERIFICATION
   /qa                   Browser QA via Playwright (optional dependency)
   /postmortem           Campaign postmortem from telemetry + git history
 
+GITHUB & CI
+  /triage [issue|pr]    GitHub issue and PR investigator
+  /pr-watch [number]    Local PR auto-fix — watches CI, fixes failures, offers merge
+
 UTILITIES
   /session-handoff      Session context transfer
   /setup                First-run harness configuration
+  /schedule [action]    Manage recurring tasks (CronCreate/Delete/List)
+  /merge-review         Fleet worktree merge conflict analysis
+  /ascii-diagram        Perfectly aligned ASCII diagrams via character grid
+  /do rollback          Restore to last campaign checkpoint (git stash pop)
+
+OBSERVABILITY & LEARNING
+  /dashboard            Real-time harness dashboard — campaigns, events, health
+  /learn                Extract patterns from completed campaigns into knowledge base
 
 Direct invocation (/skill-name) always bypasses the router.
 ```
@@ -249,6 +252,14 @@ Direct invocation ALWAYS works and bypasses the router:
 
 The router is additive, not a gate. Power users who know what they want
 should use direct invocation.
+
+## Fringe Cases
+
+- **`.planning/` does not exist**: The router works without `.planning/`. Tiers 0, 2, and 3 are fully independent of it. Tier 1 (active-state short-circuit) reads `.planning/campaigns/` and `.planning/fleet/` — if those directories are absent, skip Tier 1 gracefully and fall through to Tier 2. Never crash on a missing `.planning/` directory.
+- **`harness.json` missing**: Skip the Skill Registry Check and proceed directly to Tier 0. Announce discovered skills from the filesystem if counts can be read, otherwise route from built-in keywords.
+- **Multiple skills match at Tier 2**: Fall through to Tier 3 for disambiguation rather than picking arbitrarily.
+- **User input is empty or whitespace**: Respond with the `--list` output and a prompt to provide a direction.
+- **Routed skill not found**: Report "Skill not found" and fall back to Marshal as the safe default.
 
 ## Quality Gates
 

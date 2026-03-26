@@ -80,6 +80,19 @@ Break the direction into 3-8 phases:
 For each phase:
 
 1. **Direction check**: Is this phase still aligned with the campaign goal?
+
+1.5. **Create phase checkpoint** (before delegating):
+   ```bash
+   git stash push --include-untracked -m "citadel-checkpoint-{campaign-slug}-phase-{N}"
+   ```
+   - Capture the stash ref from the output (e.g., `stash@{0}`) and write it to the campaign
+     file's Continuation State:
+     ```
+     checkpoint-phase-N: stash@{0}
+     ```
+   - If `git stash` fails (nothing to stash, detached HEAD, clean working tree, etc.):
+     log `checkpoint-phase-N: none` and continue. **Never block on checkpoint failure.**
+
 2. **Log delegation start**:
    ```bash
    node .citadel/scripts/telemetry-log.cjs --event agent-start --agent {delegate-name} --session {campaign-slug}
@@ -205,6 +218,17 @@ When all phases are done:
    ```
 6. Output a final HANDOFF
 7. Suggest `/postmortem` to generate a campaign postmortem
+8. **Auto-fix handoff** — if any PRs were created this campaign, output for each:
+   ```
+   ---PR READY---
+   PR #<N>: <url>
+
+   To watch CI automatically:
+     Local  →  /pr-watch <N>          fixes failures in this terminal
+     Cloud  →  open in Claude Code web or mobile, toggle "Auto fix" ON
+               (fixes CI + review comments remotely; requires Claude GitHub App)
+   ---
+   ```
 
 ## Health Diagnostic (Undirected Mode)
 
@@ -240,6 +264,27 @@ Park the campaign when:
 - Direction drift detected (2 consecutive alignment check failures)
 - Typecheck introduces 5+ new errors in a single phase
 - Build introduces regressions in existing tests
+
+## Recovery
+
+If a phase fails hard and needs rollback:
+
+1. Find the checkpoint: read Continuation State for the phase's checkpoint ref
+2. Run: `git stash pop <ref>` or `git stash pop` if ref is unavailable
+3. Verify the restore: run typecheck to confirm clean state
+4. Log the rollback to the Decision Log with what was restored and why
+5. The next session will see the campaign is active and can retry the phase with a different approach
+
+Checkpoint refs are stored in the campaign Continuation State as:
+  checkpoint-phase-N: stash@{N} | none
+
+## Fringe Cases
+
+- **No active campaign + no direction given**: Run the Health Diagnostic (undirected mode). Check intake, suggest next actions, never error.
+- **Campaign file corrupted or unparseable**: Log the error, skip that campaign file, and treat it as if no campaign is active. Report the corruption to the user.
+- **`git stash` fails during checkpoint creation** (clean working tree, detached HEAD, etc.): Log `checkpoint-phase-N: none` and continue. Never block on checkpoint failure.
+- **`.planning/campaigns/` does not exist**: Treat as no active campaigns. Proceed to directed or undirected mode without crashing.
+- **Sub-agent returns no HANDOFF**: Treat the phase as partial. Log what was observed, record it in the campaign file, and proceed to the next phase rather than hanging.
 
 ## Exit Protocol
 

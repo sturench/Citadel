@@ -15,16 +15,20 @@ const fs = require('fs');
 const path = require('path');
 const health = require('./harness-health-util');
 
-const PROJECT_ROOT = health.PROJECT_ROOT;
-const STATE_FILE = path.join(PROJECT_ROOT, '.claude', 'circuit-breaker-state.json');
+const PLUGIN_DATA_DIR = health.PLUGIN_DATA_DIR;
+const STATE_FILE = path.join(PLUGIN_DATA_DIR, 'circuit-breaker-state.json');
+const LEGACY_STATE_FILE = path.join(health.PROJECT_ROOT, '.claude', 'circuit-breaker-state.json');
 const THRESHOLD = 3;
 
 function readState() {
+  // Try PLUGIN_DATA_DIR first, fall back to legacy .claude/ location
+  const stateFile = fs.existsSync(STATE_FILE) ? STATE_FILE
+    : fs.existsSync(LEGACY_STATE_FILE) ? LEGACY_STATE_FILE
+    : null;
   try {
-    return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8'));
-  } catch {
-    return { consecutiveFailures: 0, lifetimeTrips: 0, lastFailedTool: null, lastFailureTime: null };
-  }
+    if (stateFile) return JSON.parse(fs.readFileSync(stateFile, 'utf8'));
+  } catch { /* fall through */ }
+  return { consecutiveFailures: 0, lifetimeTrips: 0, lastFailedTool: null, lastFailureTime: null };
 }
 
 function writeState(state) {

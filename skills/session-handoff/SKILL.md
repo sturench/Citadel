@@ -50,3 +50,24 @@ Keep it to 3-5 bullets, under 150 words. This is a context transfer, not a repor
 - No vague statements ("made progress on X")
 - Specific file references where relevant
 - Decisions include reasoning, not just the choice
+
+## Fringe Cases
+
+**No active campaign and no git changes**: If there is nothing to summarize, say so explicitly: "No active campaign or session changes found. Nothing to hand off." Do not fabricate a handoff.
+
+**No context to summarize** (fresh session with no edits): Output a minimal handoff noting the session start state. At minimum, include what the user asked about and what was found.
+
+**Campaign is in a blocked/parked state**: Include the block reason and the recommended next action in the handoff so the next session can resume immediately.
+
+## Exit Protocol
+
+Output the HANDOFF block and then wait for the next command. This skill does not write to disk — the HANDOFF block is the deliverable, for the user to copy into the next session or save manually.
+
+```
+---HANDOFF---
+- {what was built or changed — be specific}
+- {key decisions and tradeoffs — include reasoning}
+- {unresolved items — what's blocking}
+- {next steps — what the next session should do first}
+---
+```

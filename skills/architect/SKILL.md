@@ -219,3 +219,25 @@ If approved: write the campaign file using the architecture as the direction.
 - File tree is complete (no "etc." or "..." placeholders)
 - Phase dependencies are explicit (no implicit ordering)
 - Risk register has at least 2 entries
+
+## Fringe Cases
+
+**No PRD exists**: Treat the user's description + the existing codebase as the spec. Read the file tree and package.json to infer context. Proceed without requiring a PRD — see "If no PRD" in Step 1.
+
+**Project already has code**: Use feature mode. Read the existing architecture first. The file tree shows only new/modified files. Phase 0 must record the baseline typecheck and test state.
+
+**Vague description**: If the user's description is too vague to produce verifiable end conditions, ask at most 2 clarifying questions before proceeding. Don't block on perfect clarity.
+
+**If .planning/ does not exist**: Create it before writing the architecture document. If creation is not possible, present the architecture document inline and instruct the user to save it.
+
+## Exit Protocol
+
+```
+---HANDOFF---
+- Architecture: {app name}
+- Document: .planning/architecture-{slug}.md
+- Phases: {count}
+- Estimated complexity: {low/medium/high}
+- Next: Archon campaign ready to execute
+---
+```

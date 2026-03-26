@@ -125,6 +125,14 @@ When Archon delegates a build phase that modifies view files:
 - **Empty states shipped as features** — data not connected, UI renders skeleton
 - **"Works on my machine"** — screenshots are artifacts anyone can review
 
+## Fringe Cases
+
+- **Dev server is not running**: Offer to start it. Output: "Dev server not detected on localhost:{port}. Start it with `npm run dev` or equivalent, then re-run /live-preview." Do not attempt screenshots against a dead server.
+- **Port is not 3000**: Check common alternatives (3001, 5173, 4173, 8080) before asking. Read `package.json` scripts for a `--port` flag or `PORT` env variable.
+- **Screenshot tool unavailable** (Playwright not installed): Output what to check manually — list the modified routes, describe what each should render, and suggest installing Playwright: `npm i -D playwright`. Exit gracefully without crashing.
+- **`.planning/screenshots/` does not exist**: Create the directory before writing artifacts. Never error on a missing output directory.
+- **No view-layer files modified**: Exit immediately with "No view-layer files modified. Nothing to preview." This is expected and correct for non-UI repos.
+
 ## Quality Gates
 
 - Every modified view file must have a corresponding screenshot

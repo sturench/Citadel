@@ -331,6 +331,14 @@ Protocol:
    - After every wave completes
    - Before spawning a new wave (clear stale claims first)
 
+## Fringe Cases
+
+- **`.planning/fleet/` does not exist**: Create the directory before writing the session file. Never assume the directory exists — create it on first write.
+- **All agents in a wave fail**: Escalate to the user rather than proceeding blindly to the next wave. Output which agents failed, why, and ask for direction before continuing.
+- **Worktree checkout fails for an agent**: Skip that agent for the current wave, log the failure in the session file, and continue with the remaining agents. Record the skipped scope as a gap for the next wave.
+- **`.planning/` does not exist**: Create `.planning/fleet/` before starting. If `.planning/coordination/` is also absent, skip scope claim registration — it is optional infrastructure.
+- **Discovery compression script missing**: If `.citadel/scripts/compress-discovery.cjs` is not found, write raw HANDOFF excerpts to the briefs directory instead of compressed output.
+
 ## Exit Protocol
 
 Update the session file, then output:

@@ -177,6 +177,14 @@ After generating all files:
 If typecheck is not available or not configured, do a manual read-through of
 each generated file to verify syntax and imports are correct.
 
+## Fringe Cases
+
+- **Target directory or file already exists**: Do not silently overwrite. Confirm with the user before proceeding. Output: "A file at `{path}` already exists. Overwrite it?" and wait for confirmation.
+- **Template or exemplar not found**: List the available file types in the codebase and ask which one to use as the exemplar. Never scaffold from memory if no exemplar exists.
+- **Language or framework not detected**: Ask the user directly rather than guessing. One question: "What type of file should this be? (e.g., React component, Express route, utility function)"
+- **Typecheck fails after generation**: Fix the issue before exiting — do not leave the user with broken generated files.
+- **No wiring point found**: Note the missing registration explicitly in the exit summary rather than silently leaving the file unwired.
+
 ## Quality Gates
 
 All of these must be true before the skill exits:

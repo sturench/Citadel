@@ -159,6 +159,14 @@ on `WebFetch(https://github.com/jehna/readme-best-practices)` with zero output.
 The circuit breaker didn't catch it because the tool didn't *fail* — it just
 never completed.
 
+## Fringe Cases
+
+- **No web access available**: Run all scouts in local-only mode. Each scout searches the codebase, reads docs, and produces findings from local sources. Note the limitation in the final REPORT's confidence level.
+- **Search returns nothing relevant for a scout angle**: The scout should broaden its query, try one alternative angle, and if still empty, report "No strong evidence found for this angle" rather than fabricating findings. The gap becomes an Open Question in the final report.
+- **`.planning/research/` does not exist**: Create it (including the `fleet-{slug}/` subdirectory) before any scout writes its findings. Never error on a missing output directory.
+- **A scout times out**: Treat its angle as a gap. Record it in the final report's Open Questions section. Do not block the rest of the wave.
+- **Question decomposes into fewer than 3 independent angles**: Fall back to `/research` (single agent) rather than forcing artificial parallelism.
+
 ## Quality Gates
 
 - Every scout must produce a findings document
@@ -178,5 +186,3 @@ never completed.
 - Report: .planning/research/fleet-{slug}/REPORT.md
 ---
 ```
-
-DO NOT modify any other files. Only create the skill directory and SKILL.md.

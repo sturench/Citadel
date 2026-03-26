@@ -63,6 +63,7 @@ function main() {
     performanceLint(filePath, relativePath);
     dependencyPatternLint(filePath, relativePath);
     designManifestLint(filePath, relativePath);
+    docStalenessCheck(filePath, relativePath);
 
     // Run type check
     const exitCode = typeCheck(filePath, relativePath);
@@ -392,6 +393,68 @@ function designManifestLint(filePath, relativePath) {
       (offPalette.length > 5 ? ` (+${offPalette.length - 5} more)` : '') +
       `\n  Palette: ${paletteColors.slice(0, 8).join(', ')}${paletteColors.length > 8 ? ' ...' : ''}\n`
     );
+  }
+}
+
+// ── Doc Staleness Detection ──────────────────────────────────────────────────
+
+/**
+ * Lightweight heuristic: if a source file with exported function signatures
+ * was edited AND there's a README or .md file in the same directory,
+ * queue a potential-staleness event for doc-sync processing.
+ *
+ * Never blocks. Exit 0 always.
+ */
+function docStalenessCheck(filePath, relativePath) {
+  // Only check source files
+  if (!/\.(ts|tsx|js|jsx|py|go|rs)$/.test(filePath)) return;
+
+  let content;
+  try {
+    content = fs.readFileSync(filePath, 'utf8');
+  } catch {
+    return;
+  }
+
+  // Heuristic: does the file contain an exported function/method declaration?
+  const signaturePatterns = [
+    /^export\s+(async\s+)?function\s+\w+/m,  // export function / export async function
+    /^export\s+(default\s+)?class\s+\w+/m,   // export class
+    /^def\s+\w+/m,                            // Python def
+    /^func\s+\w+/m,                           // Go func
+    /^pub\s+fn\s+\w+/m,                       // Rust pub fn
+  ];
+
+  const hasSignature = signaturePatterns.some(re => re.test(content));
+  if (!hasSignature) return;
+
+  // Check if there's a README or other .md file in the same directory
+  const dir = path.dirname(filePath);
+  let hasDocs = false;
+  try {
+    const entries = fs.readdirSync(dir);
+    hasDocs = entries.some(e => /\.md$/i.test(e));
+  } catch {
+    return;
+  }
+
+  if (!hasDocs) return;
+
+  // Queue the staleness event
+  try {
+    const queuePath = path.join(PROJECT_ROOT, '.planning', 'telemetry', 'doc-sync-queue.jsonl');
+    const queueDir = path.dirname(queuePath);
+    if (!fs.existsSync(queueDir)) return;
+
+    const entry = JSON.stringify({
+      event: 'potential-staleness',
+      file: relativePath,
+      timestamp: new Date().toISOString(),
+      status: 'needs-review',
+    });
+    fs.appendFileSync(queuePath, entry + '\n');
+  } catch {
+    // Never block on queue failures
   }
 }
 
