@@ -5,6 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Node.js 18+](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 [![Claude Code](https://img.shields.io/badge/Claude_Code-compatible-blueviolet.svg)](https://docs.anthropic.com/en/docs/claude-code)
+[![Interactive Demo](https://img.shields.io/badge/Demo-Interactive%20Router-00d2ff.svg)](https://sethgammon.github.io/Citadel/)
 
 Citadel turns Claude Code into a multi-agent engineering factory: durable state, intelligent routing, parallel execution, and safety guardrails for autonomous coding campaigns that outlast any single session.
 
@@ -73,19 +74,11 @@ Say what you want. `/do` routes it to the cheapest tool that can handle it.
 
 ## How It Works
 
-You type what you want. `/do` classifies your intent and routes it to the appropriate execution tier — from regex-based operations for simple fixes to frontier models for architectural decisions. This matches tool capability to task difficulty, so you never over-spend on a typo or under-power a campaign.
-
-```
-You say:                               Citadel runs:
-─────────────────────────────────────────────────────────────
-"fix the typo on line 42"          →   Direct edit (zero overhead)
-"review the auth module"           →   /review (5-pass code review)
-"add payments to my app"           →   /create-app tier 5 (feature addition)
-"build me a recipe app"            →   /create-app → /prd → /architect → /archon
-"overhaul all three services"      →   /fleet (parallel agents)
-```
+You type what you want. `/do` classifies your intent across four tiers — pattern match, active session state, keyword lookup, and LLM classification — and dispatches to the cheapest tool capable of handling it. A typo fix never touches an LLM. A multi-service overhaul gets a parallel fleet with isolated worktrees and discovery sharing between waves.
 
 Simple tasks get simple tools. Complex tasks get campaigns with phases, verification, and self-correction. You never have to choose.
+
+**[▶ See it route live →](https://sethgammon.github.io/Citadel/)**
 
 ## The Orchestration Ladder
 
@@ -267,6 +260,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on submitting issues, PRs,
 
 ## Learn More
 
+- [**Interactive routing demo**](https://sethgammon.github.io/Citadel/) — type any task, watch the tier cascade animate
 - [Full install guide](QUICKSTART.md)
 - [Skills reference](docs/SKILLS.md)
 - [Hooks reference](docs/HOOKS.md)
