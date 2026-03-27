@@ -9,7 +9,7 @@
       --bg: #0d1117;
       --surface: #161b22;
       --surface-2: #21262d;
-      --border: #30363d;
+      --border: #3d444d;
       --text: #e6edf3;
       --muted: #8b949e;
       --dim: #4a5568;
@@ -287,6 +287,7 @@
 
     /* ─── Result panel — folds out downward from search bar ─── */
     .result-panel {
+      display: none;
       background: var(--surface); border: 1.5px solid var(--border);
       border-radius: 14px; overflow: hidden;
       clip-path: inset(0 0 100% 0 round 14px);
@@ -543,6 +544,7 @@
     /* ─── Stats bar ─── */
     .stat-bar {
       width: 100%; max-width: 1100px;
+      margin: 0 auto;
       display: grid; grid-template-columns: repeat(4, 1fr);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
@@ -797,6 +799,213 @@
     }
     .reset-btn:hover { border-color: var(--cyan); color: var(--cyan); }
 
+    /* ─── Nav CTA ─── */
+    .nav-cta {
+      font-size: 12px; padding: 5px 14px; border-radius: 6px;
+      background: color-mix(in srgb, var(--cyan) 10%, var(--surface-2));
+      border: 1px solid color-mix(in srgb, var(--cyan) 35%, var(--border));
+      color: var(--cyan); text-decoration: none;
+      transition: background 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover {
+      background: color-mix(in srgb, var(--cyan) 18%, var(--surface-2));
+      border-color: var(--cyan);
+    }
+
+    /* ─── Stat captions ─── */
+    .stat-caption {
+      font-size: 11px; color: var(--dim);
+      margin-top: 5px; line-height: 1.5;
+      max-width: 160px; margin-left: auto; margin-right: auto;
+    }
+
+    /* ─── Cascade section (replaces how-section 2×2 grid) ─── */
+    .cascade-section {
+      width: 100%; max-width: 700px;
+      padding: 48px 32px 0;
+      margin: 0 auto;
+    }
+    .cascade-section-heading {
+      text-align: center; margin-bottom: 32px;
+    }
+    .cascade-section-heading h2 {
+      font-size: 22px; font-weight: 600; color: var(--text);
+    }
+
+    .cascade-card {
+      padding: 24px 28px; border-radius: 14px;
+      border: 1.5px solid color-mix(in srgb, var(--card-color, var(--border)) 30%, var(--border));
+      background: var(--surface);
+      position: relative; overflow: hidden;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .cascade-card > summary { list-style: none; }
+    .cascade-card > summary::-webkit-details-marker { display: none; }
+    .cascade-card::before {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 4px; height: 100%;
+      background: var(--card-color, var(--border)); opacity: 0.7;
+    }
+    .cascade-card::after {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at top left, color-mix(in srgb, var(--card-color, transparent) 6%, transparent) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .cascade-card:hover {
+      border-color: color-mix(in srgb, var(--card-color, var(--cyan)) 60%, var(--border));
+      box-shadow: 0 0 32px color-mix(in srgb, var(--card-color, var(--cyan)) 12%, transparent);
+    }
+
+    .cascade-summary {
+      display: flex; align-items: center; gap: 12px; cursor: default;
+    }
+    .cascade-summary-text { flex: 1; min-width: 0; }
+    .cascade-summary-name { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 2px; }
+    .cascade-summary-sub { font-size: 11px; color: var(--dim); }
+    .cascade-summary-cost {
+      font-family: 'SF Mono', monospace; font-size: 11px; color: var(--dim);
+      white-space: nowrap; text-align: right;
+    }
+    .cascade-toggle {
+      font-size: 18px; color: var(--muted); line-height: 1;
+      display: none; flex-shrink: 0; width: 20px; text-align: center;
+      transition: transform 0.2s;
+    }
+    details.cascade-card[open] .cascade-toggle { transform: rotate(45deg); }
+
+    .cascade-body { margin-top: 18px; }
+    .cascade-body .card-vis { margin: 0 0 16px 0; border-radius: 8px; }
+    .cascade-body .how-card-desc { padding-left: 0; }
+    .cascade-body .how-examples { padding-left: 0; }
+    .cascade-footnote {
+      font-size: 11px; color: var(--dim); margin-top: 12px;
+      font-style: italic; line-height: 1.5;
+    }
+
+    /* Desktop: always show details content regardless of open attr */
+    @media (min-width: 761px) {
+      details.cascade-card > .cascade-body { display: block !important; }
+      .cascade-toggle { display: none !important; }
+      .cascade-summary { cursor: default; pointer-events: none; }
+    }
+
+    /* Connectors between cascade cards */
+    .cascade-connector {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 4px 0; gap: 2px;
+    }
+    .cascade-connector-line {
+      width: 1px; height: 18px;
+      background: color-mix(in srgb, var(--conn-color, var(--border)) 45%, var(--border));
+    }
+    .cascade-connector-text {
+      font-size: 10px; color: var(--dim); font-family: 'SF Mono', monospace;
+    }
+    .cascade-connector-chevron { color: var(--dim); font-size: 13px; line-height: 1; }
+
+    /* Tier 3 fork */
+    .tier3-fork { margin-top: 18px; }
+    .fork-stem {
+      width: 1px; height: 18px;
+      background: linear-gradient(to bottom,
+        color-mix(in srgb, var(--orange) 50%, transparent),
+        color-mix(in srgb, var(--purple) 50%, transparent));
+      margin: 0 auto;
+    }
+    .fork-branches { display: flex; gap: 14px; }
+    .fork-branch {
+      flex: 1; padding: 14px 16px; border-radius: 10px;
+      background: var(--surface-2); border: 1.5px solid var(--border);
+      border-left-width: 3px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .fork-branch:hover {
+      border-color: var(--branch-color, var(--cyan));
+      box-shadow: 0 0 16px color-mix(in srgb, var(--branch-color, var(--cyan)) 10%, transparent);
+    }
+    .fork-branch-name {
+      font-size: 14px; font-weight: 700; font-family: 'SF Mono', monospace; margin-bottom: 4px;
+    }
+    .fork-branch-desc { font-size: 12px; color: var(--muted); line-height: 1.5; margin-bottom: 10px; }
+    .fork-branch-examples { display: flex; flex-direction: column; gap: 4px; }
+    .fork-or-divider {
+      display: none; text-align: center; font-size: 11px; color: var(--dim);
+      padding: 6px 0; font-style: italic; align-self: center;
+    }
+
+    /* ─── Campaign depth section ─── */
+    .campaign-depth {
+      width: 100%; background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 52px 32px; margin-top: 48px;
+    }
+    .campaign-depth-inner { max-width: 860px; margin: 0 auto; }
+    .campaign-depth-header { text-align: center; margin-bottom: 12px; }
+    .campaign-depth-header h2 { font-size: 24px; font-weight: 700; color: var(--text); }
+    .campaign-depth-setup {
+      font-size: 15px; color: var(--muted); text-align: center;
+      margin-bottom: 40px; line-height: 1.65;
+    }
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .feature-point {
+      padding: 20px; border-radius: 12px;
+      background: var(--surface-2); border: 1px solid var(--border);
+    }
+    .feature-icon { font-size: 18px; margin-bottom: 10px; }
+    .feature-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .feature-desc { font-size: 13px; color: var(--muted); line-height: 1.6; }
+    .campaign-cta { text-align: center; margin-top: 32px; }
+    .campaign-cta a {
+      font-size: 13px; color: var(--cyan); text-decoration: none;
+      border-bottom: 1px solid color-mix(in srgb, var(--cyan) 35%, transparent);
+      padding-bottom: 2px; transition: border-color 0.15s;
+    }
+    .campaign-cta a:hover { border-color: var(--cyan); }
+
+    /* ─── Inline install section ─── */
+    .install-section {
+      width: 100%; background: var(--bg);
+      padding: 52px 32px; border-top: 1px solid var(--border);
+    }
+    .install-inner {
+      max-width: 860px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.4fr; gap: 64px;
+      align-items: center;
+    }
+    .install-left h2 {
+      font-size: 28px; font-weight: 700; color: var(--text);
+      line-height: 1.2; margin-bottom: 16px;
+    }
+    .install-left p { font-size: 14px; color: var(--muted); line-height: 1.75; }
+    .install-steps { display: flex; flex-direction: column; gap: 18px; }
+    .install-step { display: flex; gap: 14px; align-items: flex-start; }
+    .install-step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid var(--cyan); color: var(--cyan);
+      font-size: 12px; font-weight: 700; display: flex;
+      align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .install-step-body { flex: 1; min-width: 0; }
+    .install-step-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .install-code {
+      font-family: 'SF Mono', monospace; font-size: 12px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; color: var(--cyan); word-break: break-all;
+    }
+    .install-guide-link {
+      display: block; text-align: right;
+      font-size: 12px; color: var(--muted); text-decoration: none;
+      margin-top: 16px; transition: color 0.15s;
+    }
+    .install-guide-link:hover { color: var(--cyan); }
+
+    /* ─── Screen 2 scrollable ─── */
+    .screen-2 { overflow-y: auto; scrollbar-width: none; }
+    .screen-2::-webkit-scrollbar { display: none; }
+
     /* ─── Responsive ─── */
     @media (max-width: 760px) {
       nav { padding: 12px 20px; gap: 12px; }
@@ -811,7 +1020,37 @@
       .how-section { grid-template-columns: 1fr; padding: 32px 16px 40px; }
       .stat-bar { grid-template-columns: repeat(2, 1fr); }
       .stat { border-bottom: 1px solid var(--border); }
+      .stat:nth-child(even) { border-right: none; }
+      .stat:nth-last-child(-n+2) { border-bottom: none; }
+      .nav-badge { display: none; }
       .classification { grid-template-columns: repeat(2, 1fr); }
+      /* Cascade mobile */
+      .cascade-section { padding: 32px 16px 0; }
+      .cascade-toggle { display: block !important; }
+      .cascade-summary { cursor: pointer; pointer-events: auto !important; }
+      .feature-grid { grid-template-columns: 1fr; gap: 16px; }
+      .install-inner { grid-template-columns: 1fr; gap: 32px; }
+      .install-left h2 { font-size: 22px; }
+      .install-section { padding: 40px 16px; }
+      .campaign-depth { padding: 40px 16px; margin-top: 32px; }
+      .fork-branches { flex-direction: column; }
+      .fork-or-divider { display: block; }
+    }
+    /* ─── Narrow mobile: hide star to prevent nav overflow ─── */
+    @media (max-width: 540px) {
+      .nav-star { display: none; }
+    }
+
+    /* ─── prefers-reduced-motion ─── */
+    @media (prefers-reduced-motion: reduce) {
+      .tier-row, .output-section, .result-panel,
+      .side-panel, .panel-backdrop { transition: none !important; }
+      .scroll-cue.visible { animation: none !important; }
+      .hero h1 { animation: none !important; }
+      .t0-word { animation: none !important; background: color-mix(in srgb, var(--green) 22%, transparent); color: var(--green); }
+      .t2-r1, .t2-r2, .t2-r3 { animation: none !important; }
+      .t3-chip { animation: none !important; opacity: 1 !important; transform: none !important; }
+      .tf-f1, .tf-f2, .tf-f3 { animation: none !important; width: 60% !important; }
     }
   </style>
 </head>
@@ -821,13 +1060,13 @@
   <nav>
     <a class="nav-logo" href="https://github.com/SethGammon/Citadel">CITADEL</a>
     <span class="nav-sep">·</span>
-    <button class="nav-link" onclick="openPanel('install')">Install</button>
     <button class="nav-link" onclick="openPanel('skills')">Skills</button>
     <button class="nav-link" onclick="openPanel('hooks')">Hooks</button>
     <button class="nav-link" onclick="openPanel('campaigns')">Campaigns</button>
     <div class="nav-right">
       <span class="nav-badge">v2.1</span>
-      <a class="nav-star" href="https://github.com/SethGammon/Citadel">★ Star</a>
+      <a class="nav-star" id="nav-star" href="https://github.com/SethGammon/Citadel">★ Star on GitHub</a>
+      <a class="nav-cta" href="#install-section" onclick="scrollToInstall(); return false;">Get Started</a>
     </div>
   </nav>
 
@@ -838,18 +1077,17 @@
   <!-- Hero -->
   <div class="hero">
     <div class="hero-eyebrow">
-      <span>⚡</span>
-      <span>Interactive Demo · /do Intent Router</span>
+      <span>Agent orchestration for Claude Code</span>
     </div>
-    <h1>Say what you want.<br><span class="h1-sub">Citadel routes it.</span></h1>
-    <p>Type any engineering task. The router evaluates four tiers in sequence and dispatches to the cheapest tool capable. No configuration, no manual skill selection.</p>
+    <h1>Every command costs the same.<br><span class="h1-sub">Most of them shouldn't.</span></h1>
+    <p>Type what you want. Citadel finds the cheapest way to do it.</p>
   </div>
 
   <!-- Search bar -->
   <div class="search-wrap">
     <div class="search-bar">
       <span class="search-prompt">/do</span>
-      <input id="cmd-input" type="text" placeholder="describe what you want…"
+      <input id="cmd-input" type="text" placeholder="Type any engineering task…"
              autocomplete="off" spellcheck="false" />
       <div class="search-actions">
         <span class="live-badge" id="live-badge"></span>
@@ -1003,123 +1241,238 @@
   </div><!-- /screen-1 -->
 
   <div class="screen-2" id="screen-2">
-  <!-- Stats -->
+
+  <!-- Vertical tier cascade -->
+  <div class="cascade-section">
+    <div class="cascade-section-heading">
+      <h2>How routing works</h2>
+    </div>
+
+    <!-- Tier 0 -->
+    <details class="cascade-card" style="--card-color:var(--green)" open>
+      <summary class="cascade-summary">
+        <span class="how-tier-badge" style="color:var(--green)">TIER 0</span>
+        <div class="cascade-summary-text">
+          <div class="cascade-summary-name">Pattern Match</div>
+          <div class="cascade-summary-sub">Regex · 9 built-in patterns</div>
+        </div>
+        <div class="cascade-summary-cost">~0 tokens · &lt;1ms</div>
+        <span class="cascade-toggle">+</span>
+      </summary>
+      <div class="cascade-body">
+        <div class="card-vis">
+          <div class="t0-code"><span class="t0-pre">/do </span><span class="t0-word">fix typo</span><span class="t0-pre"> on line 42</span></div>
+          <div class="t0-tag">✓ REGEX HIT · &lt;1ms · 0 TOKENS</div>
+        </div>
+        <p class="how-card-desc">Pure regex against the raw input string. No model call, no skill load. Catches exact-intent commands that need no classification — typos, renames, commits, status checks. If it matches here, Claude executes it directly and stops.</p>
+        <div class="how-examples">
+          <div class="how-example" style="--ex-color:var(--green)" data-cmd="fix the typo on line 42">/do fix the typo on line 42</div>
+          <div class="how-example" style="--ex-color:var(--green)" data-cmd="rename AuthService to AuthHandler">/do rename AuthService to AuthHandler</div>
+          <div class="how-example" style="--ex-color:var(--green)" data-cmd="commit my changes">/do commit my changes</div>
+        </div>
+        <p class="cascade-footnote">Tier 1 (active session context) is evaluated in live Claude Code sessions — skipped in this demo.</p>
+      </div>
+    </details>
+
+    <div class="cascade-connector" style="--conn-color:var(--cyan)">
+      <div class="cascade-connector-line"></div>
+      <span class="cascade-connector-text">No match · evaluates next tier</span>
+      <div class="cascade-connector-chevron">↓</div>
+    </div>
+
+    <!-- Tier 2 -->
+    <details class="cascade-card" style="--card-color:var(--cyan)">
+      <summary class="cascade-summary">
+        <span class="how-tier-badge" style="color:var(--cyan)">TIER 2</span>
+        <div class="cascade-summary-text">
+          <div class="cascade-summary-name">Keyword Lookup</div>
+          <div class="cascade-summary-sub">12 registered skill keywords</div>
+        </div>
+        <div class="cascade-summary-cost">~0 tokens · &lt;10ms</div>
+        <span class="cascade-toggle">+</span>
+      </summary>
+      <div class="cascade-body">
+        <div class="card-vis">
+          <div class="t2-table">
+            <div class="t2-row t2-r1">review <span>→ /review</span></div>
+            <div class="t2-row t2-r2">debug <span>→ /systematic-debugging</span></div>
+            <div class="t2-row t2-r3">scaffold <span>→ /scaffold</span></div>
+          </div>
+        </div>
+        <p class="how-card-desc">The input is scanned against a keyword table built from every installed skill. "review" → /review, "debug" → /systematic-debugging. New skills register their own keywords automatically. No LLM needed.</p>
+        <div class="how-examples">
+          <div class="how-example" style="--ex-color:var(--cyan)" data-cmd="review the auth module">/do review the auth module</div>
+          <div class="how-example" style="--ex-color:var(--cyan)" data-cmd="write tests for UserService">/do write tests for UserService</div>
+          <div class="how-example" style="--ex-color:var(--cyan)" data-cmd="scaffold a new dashboard component">/do scaffold a new dashboard component</div>
+        </div>
+      </div>
+    </details>
+
+    <div class="cascade-connector" style="--conn-color:var(--orange)">
+      <div class="cascade-connector-line"></div>
+      <span class="cascade-connector-text">No match · evaluates next tier</span>
+      <div class="cascade-connector-chevron">↓</div>
+    </div>
+
+    <!-- Tier 3 — single card, forked output -->
+    <details class="cascade-card" style="--card-color:var(--orange)">
+      <summary class="cascade-summary">
+        <span class="how-tier-badge" style="color:var(--orange)">TIER 3</span>
+        <div class="cascade-summary-text">
+          <div class="cascade-summary-name">LLM Classifier</div>
+          <div class="cascade-summary-sub">One evaluation · two possible dispatches</div>
+        </div>
+        <div class="cascade-summary-cost">~500 tokens · &lt;2s</div>
+        <span class="cascade-toggle">+</span>
+      </summary>
+      <div class="cascade-body">
+        <div class="card-vis">
+          <div class="t3-chips">
+            <span class="t3-chip t3-c1">scope: cross-domain</span>
+            <span class="t3-chip t3-c2">complexity: 4</span>
+            <span class="t3-chip t3-c3">intent: create</span>
+            <span class="t3-chip t3-c4">persist: true</span>
+            <span class="t3-chip t3-c5">parallel: false</span>
+            <span class="t3-chip t3-c6">taste: true</span>
+          </div>
+          <div class="t3-route">→ /classifier dispatched</div>
+        </div>
+        <p class="how-card-desc">Classifies 6 dimensions: scope, complexity (1–5), intent, multi-session persistence, parallel execution, and taste. The result determines the dispatch — Archon for contained work, Fleet for platform-wide scope.</p>
+        <div class="tier3-fork">
+          <div class="fork-stem"></div>
+          <div class="fork-branches">
+            <div class="fork-branch" style="--branch-color:var(--orange); border-left-color:var(--orange)">
+              <div class="fork-branch-name" style="color:var(--orange)">→ Archon</div>
+              <div class="fork-branch-desc">Single-feature, single-session work</div>
+              <div class="fork-branch-examples">
+                <div class="how-example" style="--ex-color:var(--orange); color:var(--muted)" data-cmd="build me a recipe app">/do build me a recipe app</div>
+                <div class="how-example" style="--ex-color:var(--orange); color:var(--muted)" data-cmd="add Stripe payments to checkout">/do add Stripe payments to checkout</div>
+              </div>
+            </div>
+            <div class="fork-or-divider">or</div>
+            <div class="fork-branch" style="--branch-color:var(--purple); border-left-color:var(--purple)">
+              <div class="fork-branch-name" style="color:var(--purple)">→ Fleet</div>
+              <div class="fork-branch-desc">Platform-wide or parallel work</div>
+              <div class="fork-branch-examples">
+                <div class="how-example" style="--ex-color:var(--purple); color:#c9d1d9" data-cmd="migrate the platform to TypeScript strict mode">/do migrate the platform to TypeScript strict mode</div>
+                <div class="how-example" style="--ex-color:var(--purple); color:#c9d1d9" data-cmd="redesign the entire data layer">/do redesign the entire data layer</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </details>
+  </div><!-- /cascade-section -->
+
+  <!-- Campaign depth section -->
+  <div class="campaign-depth">
+    <div class="campaign-depth-inner">
+      <div class="campaign-depth-header">
+        <h2>Work that spans sessions. Automatically.</h2>
+      </div>
+      <p class="campaign-depth-setup">Complex tasks run across sessions without losing direction — or your confidence.</p>
+      <div class="feature-grid">
+        <div class="feature-point">
+          <div class="feature-icon">⧫</div>
+          <div class="feature-title">Phase checkpoints</div>
+          <div class="feature-desc">Quality spot-checks run at the end of every phase before the next begins.</div>
+        </div>
+        <div class="feature-point">
+          <div class="feature-icon">◎</div>
+          <div class="feature-title">Circuit breakers</div>
+          <div class="feature-desc">After 3 consecutive failures, the campaign parks automatically and waits for human review.</div>
+        </div>
+        <div class="feature-point">
+          <div class="feature-icon">◈</div>
+          <div class="feature-title">Regression guards</div>
+          <div class="feature-desc">Type baselines and test counts are captured before the campaign and verified after.</div>
+        </div>
+      </div>
+      <div class="campaign-cta">
+        <a href="#" onclick="openPanel('campaigns'); return false;">Read the full campaign lifecycle →</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats bar -->
   <div class="stat-bar">
     <div class="stat">
       <div class="stat-num">33</div>
       <div class="stat-label">Skills</div>
+      <div class="stat-caption">covering code quality, debugging, research, orchestration, and more</div>
     </div>
     <div class="stat">
       <div class="stat-num">4</div>
-      <div class="stat-label">Autonomous Agents</div>
+      <div class="stat-label">Orchestrators</div>
+      <div class="stat-caption">Marshal, Archon, Fleet, Autopilot</div>
     </div>
     <div class="stat">
       <div class="stat-num">14</div>
       <div class="stat-label">Hook Events</div>
+      <div class="stat-caption">automatic quality gates without agent intervention</div>
     </div>
     <div class="stat">
       <div class="stat-num">~0</div>
       <div class="stat-label">Config Required</div>
+      <div class="stat-caption">works on any repo, any language</div>
     </div>
   </div>
 
-  <!-- How It Works cards -->
-  <div class="how-section">
-    <div class="how-card" style="--card-color:var(--green)">
-      <div class="card-vis">
-        <div class="t0-code"><span class="t0-pre">/do </span><span class="t0-word">fix typo</span><span class="t0-pre"> on line 42</span></div>
-        <div class="t0-tag">✓ REGEX HIT · &lt;1ms · 0 TOKENS</div>
+  <!-- Inline install -->
+  <div class="install-section" id="install-section">
+    <div class="install-inner">
+      <div class="install-left">
+        <h2>Try it now.</h2>
+        <p>Works on any Claude Code project.<br>No config required — Citadel detects your stack on first run.</p>
       </div>
-      <div class="how-card-header">
-        <span class="how-tier-badge" style="color:var(--green)">TIER 0</span>
-        <div>
-          <div class="how-card-name">Pattern Match</div>
-          <div class="how-card-sub">~0 tokens · &lt;1ms</div>
+      <div class="install-right">
+        <div class="install-steps">
+          <div class="install-step">
+            <div class="install-step-num">1</div>
+            <div class="install-step-body">
+              <div class="install-step-label">Install Claude Code</div>
+              <div class="install-code">npm install -g @anthropic-ai/claude-code</div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="install-step-num">2</div>
+            <div class="install-step-body">
+              <div class="install-step-label">Add Citadel as a plugin</div>
+              <div class="install-code">claude plugin add https://github.com/SethGammon/Citadel</div>
+            </div>
+          </div>
+          <div class="install-step">
+            <div class="install-step-num">3</div>
+            <div class="install-step-body">
+              <div class="install-step-label">Open any project and start</div>
+              <div class="install-code">cd your-project &amp;&amp; /do setup</div>
+            </div>
+          </div>
         </div>
-      </div>
-      <p class="how-card-desc">Pure regex against the raw input string. No model call, no skill load. Catches exact-intent commands that need no classification — typos, renames, commits, status checks. If it matches here, Claude executes it directly and stops.</p>
-      <div class="how-examples">
-        <div class="how-example" style="--ex-color:var(--green)" data-cmd="fix the typo on line 42">/do fix the typo on line 42</div>
-        <div class="how-example" style="--ex-color:var(--green)" data-cmd="rename AuthService to AuthHandler">/do rename AuthService to AuthHandler</div>
-        <div class="how-example" style="--ex-color:var(--green)" data-cmd="commit my changes">/do commit my changes</div>
-      </div>
-    </div>
-
-    <div class="how-card" style="--card-color:var(--cyan)">
-      <div class="card-vis">
-        <div class="t2-table">
-          <div class="t2-row t2-r1">review <span>→ /review</span></div>
-          <div class="t2-row t2-r2">debug <span>→ /systematic-debugging</span></div>
-          <div class="t2-row t2-r3">scaffold <span>→ /scaffold</span></div>
-        </div>
-      </div>
-      <div class="how-card-header">
-        <span class="how-tier-badge" style="color:var(--cyan)">TIER 2</span>
-        <div>
-          <div class="how-card-name">Keyword Match</div>
-          <div class="how-card-sub">~0 tokens · &lt;10ms</div>
-        </div>
-      </div>
-      <p class="how-card-desc">The input is scanned against a keyword table built from every installed skill's name and description. "review" → /review, "debug" → /systematic-debugging. New skills register their own keywords automatically. No LLM needed.</p>
-      <div class="how-examples">
-        <div class="how-example" style="--ex-color:var(--cyan)" data-cmd="review the auth module">/do review the auth module</div>
-        <div class="how-example" style="--ex-color:var(--cyan)" data-cmd="write tests for UserService">/do write tests for UserService</div>
-        <div class="how-example" style="--ex-color:var(--cyan)" data-cmd="scaffold a new dashboard component">/do scaffold a new dashboard component</div>
-      </div>
-    </div>
-
-    <div class="how-card" style="--card-color:var(--orange)">
-      <div class="card-vis">
-        <div class="t3-chips">
-          <span class="t3-chip t3-c1">scope: cross-domain</span>
-          <span class="t3-chip t3-c2">complexity: 4</span>
-          <span class="t3-chip t3-c3">intent: create</span>
-          <span class="t3-chip t3-c4">persist: true</span>
-          <span class="t3-chip t3-c5">parallel: false</span>
-          <span class="t3-chip t3-c6">taste: true</span>
-        </div>
-        <div class="t3-route">→ /archon dispatched</div>
-      </div>
-      <div class="how-card-header">
-        <span class="how-tier-badge" style="color:var(--orange)">TIER 3</span>
-        <div>
-          <div class="how-card-name">LLM Classifier</div>
-          <div class="how-card-sub">~500 tokens · ~1–2s</div>
-        </div>
-      </div>
-      <p class="how-card-desc">Classifies 6 dimensions: scope, complexity (1–5), intent, multi-session persistence, parallel execution, and taste/judgment requirements. The first match wins. Routing to Archon or Fleet is expensive — the classifier only fires when simpler tiers fail.</p>
-      <div class="how-examples">
-        <div class="how-example" style="--ex-color:var(--orange)" data-cmd="build me a recipe app">/do build me a recipe app</div>
-        <div class="how-example" style="--ex-color:var(--orange)" data-cmd="add Stripe payments to checkout">/do add Stripe payments to checkout</div>
-        <div class="how-example" style="--ex-color:var(--orange)" data-cmd="create a real-time notification system">/do create a real-time notification system</div>
-      </div>
-    </div>
-
-    <div class="how-card" style="--card-color:var(--purple)">
-      <div class="card-vis">
-        <div class="tf-tracks">
-          <div class="tf-track"><span class="tf-label">worktree-a</span><div class="tf-bar"><div class="tf-fill tf-f1"></div></div></div>
-          <div class="tf-track"><span class="tf-label">worktree-b</span><div class="tf-bar"><div class="tf-fill tf-f2"></div></div></div>
-          <div class="tf-track"><span class="tf-label">worktree-c</span><div class="tf-bar"><div class="tf-fill tf-f3"></div></div></div>
-        </div>
-        <div class="tf-merge">↓ merge arbitration · conflict check</div>
-      </div>
-      <div class="how-card-header">
-        <span class="how-tier-badge" style="color:var(--purple)">TIER 3+</span>
-        <div>
-          <div class="how-card-name">Fleet Dispatch</div>
-          <div class="how-card-sub">~500 tokens · parallel</div>
-        </div>
-      </div>
-      <p class="how-card-desc">When the classifier detects platform-wide scope or required parallelism, it dispatches to Fleet instead of Archon. Fleet spawns 2–3 agents in isolated git worktrees per wave, shares discoveries between waves, and merges results with conflict arbitration.</p>
-      <div class="how-examples">
-        <div class="how-example" style="--ex-color:var(--purple)" data-cmd="overhaul all three services">/do overhaul all three services</div>
-        <div class="how-example" style="--ex-color:var(--purple)" data-cmd="redesign the entire data layer">/do redesign the entire data layer</div>
-        <div class="how-example" style="--ex-color:var(--purple)" data-cmd="migrate the platform to TypeScript strict mode">/do migrate the platform to TypeScript strict mode</div>
+        <a class="install-guide-link" href="#" onclick="openPanel('install'); return false;">Full install guide →</a>
       </div>
     </div>
   </div>
 
+  <button class="up-cue" onclick="goToScreen(0)" aria-label="Back to top" title="Back to top">
+    <svg width="22" height="13" viewBox="0 0 22 13" fill="none">
+      <path d="M1 11.5L11 2.5L21 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <footer>
+    <span>Citadel — Agent Orchestration for Claude Code &nbsp;·&nbsp; <a href="https://repo-explainer.com/SethGammon/Citadel/">Architecture overview</a></span>
+    <span>
+      <a id="footer-star" href="https://github.com/SethGammon/Citadel">★ Star on GitHub</a>
+      &nbsp;·&nbsp;
+      <a href="https://github.com/SethGammon/Citadel/blob/main/LICENSE">MIT License</a>
+    </span>
+  </footer>
+  </div><!-- /screen-2 -->
+  </div><!-- /screens-inner -->
+  </div><!-- /page-wrap -->
+
+  <!-- Panels — outside #screens-inner so position:fixed is viewport-relative -->
   <!-- Panel backdrop -->
   <div class="panel-backdrop" id="panel-backdrop" onclick="closePanel()"></div>
 
@@ -1293,24 +1646,6 @@
     </div>
   </div>
 
-  <button class="up-cue" onclick="goToScreen(0)" aria-label="Back to top" title="Back to top">
-    <svg width="22" height="13" viewBox="0 0 22 13" fill="none">
-      <path d="M1 11.5L11 2.5L21 11.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-    </svg>
-  </button>
-
-  <footer>
-    <span>Citadel — Agent Orchestration for Claude Code &nbsp;·&nbsp; <a href="https://repo-explainer.com/SethGammon/Citadel/">Architecture overview</a></span>
-    <span>
-      <a href="https://github.com/SethGammon/Citadel">GitHub</a>
-      &nbsp;·&nbsp;
-      <a href="https://github.com/SethGammon/Citadel/blob/main/LICENSE">MIT License</a>
-    </span>
-  </footer>
-  </div><!-- /screen-2 -->
-  </div><!-- /screens-inner -->
-  </div><!-- /page-wrap -->
-
   <!-- Scroll cue (fixed, outside sliding area) -->
   <button class="scroll-cue" id="scroll-cue" onclick="goToScreen(1)" aria-label="Scroll to learn more">
     <svg width="22" height="13" viewBox="0 0 22 13" fill="none">
@@ -1465,7 +1800,8 @@
       document.body.classList.add('mode-result');
       if (currentScreen === 1) goToScreen(0);
       updateScrollCue();
-      panel.classList.add('visible');
+      panel.style.display = 'block';
+      requestAnimationFrame(() => panel.classList.add('visible'));
       resultCmd.textContent = `/do ${cmd}`;
       spinner.classList.add('active');
       timerEl.textContent = '';
@@ -1570,6 +1906,18 @@
 
       outSection.classList.add('visible');
 
+      // Tier-colored pulse — blast radius maps to cost
+      const inputEl = document.getElementById('cmd-input');
+      if (inputEl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const rect = inputEl.getBoundingClientRect();
+        const px = rect.left + rect.width / 2;
+        const py = rect.top + rect.height / 2;
+        const tierMaxR = result.tier === 0 ? 120 : result.tier === 2 ? 220 : 500;
+        const tierSpeed = result.tier === 0 ? 6 : result.tier === 2 ? 7 : 9;
+        const tierColor = result.color;
+        if (window.fireTierPulse) window.fireTierPulse(px, py, tierMaxR, tierSpeed, tierColor);
+      }
+
       // History
       history = [{ cmd, result }, ...history.filter(h => h.cmd !== cmd)].slice(0, 6);
       histIdx = -1;
@@ -1597,8 +1945,11 @@
     }
 
     function resetDemo() {
+      const panel = document.getElementById('result-panel');
       document.body.classList.remove('mode-result');
-      document.getElementById('result-panel').classList.remove('visible');
+      panel.classList.remove('visible');
+      // Re-hide from layout after clip-path out-animation completes (700ms)
+      setTimeout(() => { panel.style.display = ''; }, 750);
       input.value = '';
       histIdx = -1;
       updateLivePreview('');
@@ -1778,8 +2129,10 @@
       document.documentElement.style.setProperty('--nav-h', navH + 'px');
       const pageWrap = document.getElementById('page-wrap');
       const screen1 = document.getElementById('screen-1');
+      const screen2 = document.getElementById('screen-2');
       if (pageWrap) pageWrap.style.height = pageH + 'px';
       if (screen1) screen1.style.height = pageH + 'px';
+      if (screen2) screen2.style.height = pageH + 'px';
     }
     setupLayout();
     window.addEventListener('resize', setupLayout);
@@ -1802,7 +2155,16 @@
         const t = Math.min((now - startTime) / 780, 1);
         inner.style.transform = `translateY(${startY + diff * easeInOutQuart(t)}px)`;
         if (t < 1) requestAnimationFrame(tick);
-        else { inner.style.transform = `translateY(${endY}px)`; currentScreen = n; isTransitioning = false; updateScrollCue(); }
+        else {
+          inner.style.transform = `translateY(${endY}px)`;
+          currentScreen = n;
+          isTransitioning = false;
+          updateScrollCue();
+          if (n === 0) {
+            const s2 = document.getElementById('screen-2');
+            if (s2) s2.scrollTop = 0;
+          }
+        }
       }
       currentScreen = n;
       updateScrollCue();
@@ -1813,13 +2175,25 @@
     let wheelAcc = 0, wheelTimer = null;
     window.addEventListener('wheel', (e) => {
       if (e.target.closest('.panel-body, .side-panel')) return;
+      if (isTransitioning || document.body.classList.contains('mode-result')) {
+        e.preventDefault(); return;
+      }
+      if (currentScreen === 1) {
+        const s2 = document.getElementById('screen-2');
+        const atTop = !s2 || s2.scrollTop <= 0;
+        if (e.deltaY < 0 && atTop) {
+          e.preventDefault();
+          goToScreen(0);
+        }
+        // else let screen-2 scroll naturally
+        return;
+      }
+      // On screen 1
       e.preventDefault();
-      if (isTransitioning || document.body.classList.contains('mode-result')) return;
       wheelAcc += e.deltaY;
       clearTimeout(wheelTimer);
       wheelTimer = setTimeout(() => { wheelAcc = 0; }, 300);
-      if (wheelAcc > 40 && currentScreen === 0) { wheelAcc = 0; goToScreen(1); }
-      else if (wheelAcc < -40 && currentScreen === 1) { wheelAcc = 0; goToScreen(0); }
+      if (wheelAcc > 40) { wheelAcc = 0; goToScreen(1); }
     }, { passive: false });
 
     // Touch support
@@ -1833,7 +2207,10 @@
       if (isTransitioning || document.body.classList.contains('mode-result')) return;
       const diff = touchStartY - e.changedTouches[0].clientY;
       if (diff > 50 && currentScreen === 0) goToScreen(1);
-      else if (diff < -50 && currentScreen === 1) goToScreen(0);
+      else if (diff < -50 && currentScreen === 1) {
+        const s2 = document.getElementById('screen-2');
+        if (!s2 || s2.scrollTop <= 0) goToScreen(0);
+      }
     }, { passive: true });
 
     // Scroll cue
@@ -1934,11 +2311,17 @@
           if(dots[b+6]<0.04){ const x=dots[b+2],y=dots[b+3]; ctx.moveTo(x+BASE_R,y); ctx.arc(x,y,BASE_R,0,Math.PI*2); }
         }
         ctx.fill();
+        // Determine active tint from most recent tinted burst pulse
+        let activeTint = null;
+        for (let p = 0; p < pulses.length; p++) {
+          if (pulses[p].tint) { activeTint = pulses[p].tint; break; }
+        }
+        const glowColor = activeTint ? activeTint.replace('var(--green)', '63,185,80').replace('var(--cyan)', '0,210,255').replace('var(--orange)', '240,136,62').replace('var(--purple)', '188,140,255') : '0,210,255';
         for (let i=0;i<n;i++) {
           const b=i*STRIDE, t=dots[b+6]; if(t<0.04) continue;
           const x=dots[b+2],y=dots[b+3],r=BASE_R+(MAX_R-BASE_R)*t*t;
           ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2);
-          ctx.fillStyle=`rgba(0,210,255,${(0.15+0.6*t).toFixed(2)})`; ctx.fill();
+          ctx.fillStyle=`rgba(${glowColor},${(0.15+0.6*t).toFixed(2)})`; ctx.fill();
         }
       }
 
@@ -1964,6 +2347,68 @@
       });
       document.addEventListener('visibilitychange', ()=>document.hidden?stop():(lastTime=performance.now(),start()));
       start();
+
+      // Expose tier-colored pulse for animateRoute
+      window.fireTierPulse = function(x, y, maxR, speed, cssColor) {
+        // Resolve CSS variable to a usable color for the canvas
+        // We store it and apply it in the draw loop via a tinted burst
+        pulses.push({ x, y, r: 0, maxR, speed, type: 'burst', age: 0, tint: cssColor });
+      };
+    })();
+
+    // ─── scrollToInstall — bypasses cinematic snap ────────────────────────
+    function scrollToInstall() {
+      const screen2 = document.getElementById('screen-2');
+      const installEl = document.getElementById('install-section');
+      const doScroll = () => {
+        if (screen2 && installEl) {
+          screen2.scrollTo({ top: installEl.offsetTop, behavior: 'smooth' });
+        }
+      };
+      if (currentScreen !== 1) {
+        if (isTransitioning) return;
+        const inner = document.getElementById('screens-inner');
+        const h = document.getElementById('page-wrap').clientHeight;
+        const startY = currentScreen * -h;
+        const endY = -h;
+        const diff = endY - startY;
+        isTransitioning = true;
+        const startTime = performance.now();
+        function tick(now) {
+          const t = Math.min((now - startTime) / 780, 1);
+          inner.style.transform = `translateY(${startY + diff * easeInOutQuart(t)}px)`;
+          if (t < 1) { requestAnimationFrame(tick); }
+          else {
+            inner.style.transform = `translateY(${endY}px)`;
+            currentScreen = 1;
+            isTransitioning = false;
+            updateScrollCue();
+            doScroll();
+          }
+        }
+        requestAnimationFrame(tick);
+      } else {
+        doScroll();
+      }
+    }
+
+    // ─── GitHub star count ─────────────────────────────────────────────────
+    (function fetchStars() {
+      const CACHE_KEY = 'citadel_stars';
+      const cached = sessionStorage.getItem(CACHE_KEY);
+      function applyCount(n) {
+        const label = `★ ${n.toLocaleString()} · Star on GitHub`;
+        const nav = document.getElementById('nav-star');
+        const footer = document.getElementById('footer-star');
+        if (nav) nav.textContent = label;
+        if (footer) footer.textContent = label;
+        sessionStorage.setItem(CACHE_KEY, n);
+      }
+      if (cached) { applyCount(Number(cached)); return; }
+      fetch('https://api.github.com/repos/SethGammon/Citadel')
+        .then(r => r.ok ? r.json() : null)
+        .then(d => { if (d && d.stargazers_count != null) applyCount(d.stargazers_count); })
+        .catch(() => {});
     })();
   </script>
 </body>
