@@ -53,9 +53,11 @@
     .nav-sep { color: var(--border); }
     .nav-link {
       font-size: 13px; color: var(--muted); text-decoration: none;
-      transition: color 0.15s;
+      transition: color 0.15s; background: none; border: none;
+      cursor: pointer; padding: 0; font-family: inherit;
     }
     .nav-link:hover { color: var(--text); }
+    .nav-link.panel-active { color: var(--cyan); }
     .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
     .nav-badge {
       font-size: 11px; padding: 3px 10px; border-radius: 20px;
@@ -388,6 +390,101 @@
     }
     .spinner.active { display: inline-block; }
 
+    /* ─── Side panels ─── */
+    .panel-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.55);
+      z-index: 200; opacity: 0; pointer-events: none;
+      transition: opacity 0.25s; backdrop-filter: blur(2px);
+    }
+    .panel-backdrop.open { opacity: 1; pointer-events: all; }
+    .side-panel {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 480px; max-width: 92vw;
+      background: var(--surface); border-left: 1px solid var(--border);
+      z-index: 201; display: flex; flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      overflow: hidden;
+    }
+    .side-panel.open { transform: translateX(0); }
+    .panel-header {
+      display: flex; align-items: center; gap: 12px;
+      padding: 18px 24px; border-bottom: 1px solid var(--border);
+      background: var(--surface-2); flex-shrink: 0;
+    }
+    .panel-title {
+      font-size: 13px; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: var(--text); flex: 1;
+    }
+    .panel-close {
+      width: 28px; height: 28px; border-radius: 6px;
+      background: transparent; border: 1px solid var(--border);
+      color: var(--muted); cursor: pointer; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.15s, color 0.15s;
+    }
+    .panel-close:hover { border-color: var(--text); color: var(--text); }
+    .panel-body {
+      flex: 1; overflow-y: auto; padding: 28px 24px;
+      scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+    }
+    .panel-step { display: flex; gap: 16px; margin-bottom: 28px; }
+    .panel-step-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      border: 1.5px solid var(--cyan); color: var(--cyan);
+      font-size: 12px; font-weight: 700; display: flex;
+      align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px;
+    }
+    .panel-step-body { flex: 1; min-width: 0; }
+    .panel-step-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .panel-code {
+      font-family: 'SF Mono', monospace; font-size: 12px;
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; color: var(--cyan);
+      margin-bottom: 6px; word-break: break-all;
+    }
+    .panel-note { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .panel-section-label {
+      font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+      color: var(--dim); margin-bottom: 10px; margin-top: 24px;
+    }
+    .panel-section-label:first-child { margin-top: 0; }
+    .skill-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 6px; }
+    .skill-row {
+      display: flex; gap: 10px; align-items: baseline;
+      padding: 7px 10px; border-radius: 6px;
+      border: 1px solid transparent; transition: border-color 0.12s, background 0.12s;
+    }
+    .skill-row:hover { border-color: var(--border); background: var(--surface-2); }
+    .skill-name {
+      font-family: 'SF Mono', monospace; font-size: 12px;
+      color: var(--cyan); white-space: nowrap; min-width: 140px;
+    }
+    .skill-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+    .hook-table { width: 100%; border-collapse: collapse; }
+    .hook-table th {
+      text-align: left; font-size: 10px; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--dim); padding: 0 8px 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hook-table td {
+      padding: 9px 8px 9px 0; font-size: 12px;
+      border-bottom: 1px solid color-mix(in srgb, var(--border) 50%, transparent);
+      vertical-align: top;
+    }
+    .hook-event { font-family: 'SF Mono', monospace; color: var(--blue); white-space: nowrap; }
+    .hook-desc { color: var(--muted); line-height: 1.5; }
+    .campaign-block {
+      background: var(--surface-2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 14px 16px; margin-bottom: 12px;
+    }
+    .campaign-block-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 5px; }
+    .campaign-block-body { font-size: 12px; color: var(--muted); line-height: 1.6; }
+    .campaign-block-body code {
+      font-family: 'SF Mono', monospace; color: var(--cyan);
+      background: var(--bg); padding: 1px 5px; border-radius: 3px; font-size: 11px;
+    }
+
     /* ─── Responsive ─── */
     @media (max-width: 760px) {
       nav { padding: 12px 20px; gap: 12px; }
@@ -408,10 +505,10 @@
   <nav>
     <a class="nav-logo" href="https://github.com/SethGammon/Citadel">CITADEL</a>
     <span class="nav-sep">·</span>
-    <a class="nav-link" href="https://github.com/SethGammon/Citadel#quickstart">Install</a>
-    <a class="nav-link" href="https://github.com/SethGammon/Citadel/blob/main/docs/SKILLS.md">Skills</a>
-    <a class="nav-link" href="https://github.com/SethGammon/Citadel/blob/main/docs/HOOKS.md">Hooks</a>
-    <a class="nav-link" href="https://github.com/SethGammon/Citadel/blob/main/docs/CAMPAIGNS.md">Campaigns</a>
+    <button class="nav-link" onclick="openPanel('install')">Install</button>
+    <button class="nav-link" onclick="openPanel('skills')">Skills</button>
+    <button class="nav-link" onclick="openPanel('hooks')">Hooks</button>
+    <button class="nav-link" onclick="openPanel('campaigns')">Campaigns</button>
     <div class="nav-right">
       <span class="nav-badge">v2.1</span>
       <a class="nav-star" href="https://github.com/SethGammon/Citadel">★ Star</a>
@@ -669,6 +766,179 @@
         <div class="how-example" style="--ex-color:var(--purple)" data-cmd="overhaul all three services">/do overhaul all three services</div>
         <div class="how-example" style="--ex-color:var(--purple)" data-cmd="redesign the entire data layer">/do redesign the entire data layer</div>
         <div class="how-example" style="--ex-color:var(--purple)" data-cmd="migrate the platform to TypeScript strict mode">/do migrate the platform to TypeScript strict mode</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel backdrop -->
+  <div class="panel-backdrop" id="panel-backdrop" onclick="closePanel()"></div>
+
+  <!-- Install panel -->
+  <div class="side-panel" id="panel-install">
+    <div class="panel-header">
+      <span class="panel-title">Install</span>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-step">
+        <div class="panel-step-num">1</div>
+        <div class="panel-step-body">
+          <div class="panel-step-label">Install Claude Code</div>
+          <div class="panel-code">npm install -g @anthropic-ai/claude-code</div>
+          <div class="panel-note">Requires Node 18+ and an Anthropic API key or Claude.ai Pro.</div>
+        </div>
+      </div>
+      <div class="panel-step">
+        <div class="panel-step-num">2</div>
+        <div class="panel-step-body">
+          <div class="panel-step-label">Add Citadel as a plugin</div>
+          <div class="panel-code">claude plugin add https://github.com/SethGammon/Citadel</div>
+          <div class="panel-note">Installs once globally. Skills and agents become available in every project.</div>
+        </div>
+      </div>
+      <div class="panel-step">
+        <div class="panel-step-num">3</div>
+        <div class="panel-step-body">
+          <div class="panel-step-label">Open any project and start</div>
+          <div class="panel-code">cd your-project<br>claude<br>/do describe what you want</div>
+          <div class="panel-note">The SessionStart hook auto-scaffolds <code style="font-family:'SF Mono',monospace;color:var(--cyan);font-size:11px">.planning/</code> and installs hooks on first run. No manual setup required.</div>
+        </div>
+      </div>
+      <div class="panel-section-label">Optional: per-project config</div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Generate harness.json</div>
+        <div class="campaign-block-body">Run <code>/do setup</code> to create <code>.claude/harness.json</code> with project-specific settings — hook toggles, agent timeouts, doc sync, quality rules. All settings have working defaults so this step is optional.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Skills panel -->
+  <div class="side-panel" id="panel-skills">
+    <div class="panel-header">
+      <span class="panel-title">Skills — 33 installed</span>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-note" style="margin-bottom:20px">Invoke any skill directly with <code style="font-family:'SF Mono',monospace;color:var(--cyan);font-size:11px">/skill-name</code>, or let <code style="font-family:'SF Mono',monospace;color:var(--cyan);font-size:11px">/do</code> route to the right one automatically.</div>
+      <div class="panel-section-label">Routing</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/do</span><span class="skill-desc">Universal intent router. Dispatches to the cheapest capable tool — no configuration needed.</span></div>
+      </div>
+      <div class="panel-section-label">Orchestration</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/archon</span><span class="skill-desc">Multi-session campaign executor. Decomposes into phases, enforces quality gates, self-corrects direction drift.</span></div>
+        <div class="skill-row"><span class="skill-name">/fleet</span><span class="skill-desc">Parallel coordinator. Spawns 2–3 agents in isolated git worktrees per wave.</span></div>
+        <div class="skill-row"><span class="skill-name">/marshal</span><span class="skill-desc">Single-session orchestrator. Chains skills end-to-end within one conversation.</span></div>
+        <div class="skill-row"><span class="skill-name">/autopilot</span><span class="skill-desc">Intake-to-delivery pipeline. Processes items from .planning/intake/ automatically.</span></div>
+      </div>
+      <div class="panel-section-label">App Creation</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/prd</span><span class="skill-desc">Generates a Product Requirements Document from a natural language description.</span></div>
+        <div class="skill-row"><span class="skill-name">/architect</span><span class="skill-desc">Converts a PRD into a file tree, build phases, and verifiable end conditions.</span></div>
+        <div class="skill-row"><span class="skill-name">/create-app</span><span class="skill-desc">End-to-end app creation. Works on greenfield projects and existing codebases.</span></div>
+      </div>
+      <div class="panel-section-label">Code Quality</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/review</span><span class="skill-desc">5-pass structured review: correctness, security, performance, readability, consistency.</span></div>
+        <div class="skill-row"><span class="skill-name">/test-gen</span><span class="skill-desc">Generates runnable tests using your actual framework. Iterates up to 3× on failures.</span></div>
+        <div class="skill-row"><span class="skill-name">/doc-gen</span><span class="skill-desc">Three modes: function-level, module-level, or API reference. Reads your existing doc style first.</span></div>
+        <div class="skill-row"><span class="skill-name">/refactor</span><span class="skill-desc">Safe multi-file refactoring. Typechecks before and after every change. Auto-reverts on failure.</span></div>
+        <div class="skill-row"><span class="skill-name">/scaffold</span><span class="skill-desc">Project-aware file generation. Reads naming conventions from existing code before generating.</span></div>
+        <div class="skill-row"><span class="skill-name">/create-skill</span><span class="skill-desc">Extracts a repeated pattern into a reusable Citadel skill.</span></div>
+      </div>
+      <div class="panel-section-label">Research &amp; Debugging</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/research</span><span class="skill-desc">Structured investigation with confidence levels and cited sources.</span></div>
+        <div class="skill-row"><span class="skill-name">/research-fleet</span><span class="skill-desc">Parallel multi-scout research. 3–5 independent angles simultaneously, then compressed.</span></div>
+        <div class="skill-row"><span class="skill-name">/experiment</span><span class="skill-desc">Metric-driven optimization loops in isolated worktrees. Stops when metric plateaus.</span></div>
+        <div class="skill-row"><span class="skill-name">/systematic-debugging</span><span class="skill-desc">4-phase root cause: observe → hypothesize → verify → fix. Emergency stop after 2 failures.</span></div>
+        <div class="skill-row"><span class="skill-name">/live-preview</span><span class="skill-desc">Mid-build visual verification via screenshot. Used by Archon to validate UI phases.</span></div>
+      </div>
+      <div class="panel-section-label">Quality &amp; Verification</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/design</span><span class="skill-desc">Extracts or generates a design manifest: colors, typography, spacing, component patterns.</span></div>
+        <div class="skill-row"><span class="skill-name">/qa</span><span class="skill-desc">Browser QA via Playwright. Click-through testing with pass/fail assertions.</span></div>
+        <div class="skill-row"><span class="skill-name">/postmortem</span><span class="skill-desc">Auto-generates structured postmortems from campaign telemetry and git history.</span></div>
+      </div>
+      <div class="panel-section-label">Utilities</div>
+      <div class="skill-list">
+        <div class="skill-row"><span class="skill-name">/session-handoff</span><span class="skill-desc">Compresses current session context for transfer to a new session.</span></div>
+        <div class="skill-row"><span class="skill-name">/setup</span><span class="skill-desc">First-run harness configuration. Generates harness.json and registers skill keywords.</span></div>
+        <div class="skill-row"><span class="skill-name">/triage</span><span class="skill-desc">Pulls open GitHub issues and PRs, classifies by severity, searches codebase for context.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hooks panel -->
+  <div class="side-panel" id="panel-hooks">
+    <div class="panel-header">
+      <span class="panel-title">Hooks — 13 events</span>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-note" style="margin-bottom:20px">Hooks fire automatically on Claude Code lifecycle events — no agent intervention needed.</div>
+      <table class="hook-table">
+        <thead><tr><th style="width:145px">Event</th><th>What it does</th></tr></thead>
+        <tbody>
+          <tr><td class="hook-event">SessionStart</td><td class="hook-desc">Scans .planning/intake/, restores compressed context, scaffolds .planning/ on first run.</td></tr>
+          <tr><td class="hook-event">PreCompact</td><td class="hook-desc">Detects unwritten work before context compression. Auto-saves a handoff to disk.</td></tr>
+          <tr><td class="hook-event">PostCompact</td><td class="hook-desc">Re-injects the saved handoff into the new compressed context so nothing is lost.</td></tr>
+          <tr><td class="hook-event">PreToolUse</td><td class="hook-desc">Campaign scope enforcement — blocks edits outside a campaign's declared scope.</td></tr>
+          <tr><td class="hook-event">PostToolUse</td><td class="hook-desc">Runs per-file typecheck on every Edit or Write. Failures surface immediately.</td></tr>
+          <tr><td class="hook-event">Stop</td><td class="hook-desc">Quality gate before session ends. Checks for uncommitted work and open campaign phases.</td></tr>
+          <tr><td class="hook-event">StopFailure</td><td class="hook-desc">API failure telemetry — logs to .planning/telemetry/ and triggers recovery if configured.</td></tr>
+          <tr><td class="hook-event">TaskCreated</td><td class="hook-desc">Logs agent task boundary start events to the audit trail.</td></tr>
+          <tr><td class="hook-event">TaskCompleted</td><td class="hook-desc">Logs task completion with duration and outcome to agent-runs.jsonl.</td></tr>
+          <tr><td class="hook-event">SubagentStop</td><td class="hook-desc">Ensures sub-agents write a HANDOFF block and release scope claims before exiting.</td></tr>
+          <tr><td class="hook-event">SessionEnd</td><td class="hook-desc">Campaign cleanup, triggers the doc sync queue.</td></tr>
+          <tr><td class="hook-event">WorktreeCreate</td><td class="hook-desc">Installs hooks and scaffolds .planning/ in isolated Fleet worktrees.</td></tr>
+          <tr><td class="hook-event">WorktreeRemove</td><td class="hook-desc">Fleet cleanup — triggers merge conflict check and logs worktree metrics.</td></tr>
+        </tbody>
+      </table>
+      <div class="panel-section-label" style="margin-top:24px">Configuration</div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Enable / disable hooks</div>
+        <div class="campaign-block-body">Toggle individual hooks in <code>.claude/harness.json</code> under the <code>hooks</code> key. Example: <code>"postToolUse": { "enabled": false }</code></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Campaigns panel -->
+  <div class="side-panel" id="panel-campaigns">
+    <div class="panel-header">
+      <span class="panel-title">Campaigns</span>
+      <button class="panel-close" onclick="closePanel()">✕</button>
+    </div>
+    <div class="panel-body">
+      <div class="panel-note" style="margin-bottom:20px">A <strong style="color:var(--text)">campaign</strong> is work that spans multiple sessions. State is persisted to disk and resumed exactly where it left off.</div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Starting a campaign</div>
+        <div class="campaign-block-body"><code>/archon build a real-time notifications system</code> — or let <code>/do</code> route there automatically. Archon creates a file at <code>.planning/campaigns/{slug}.md</code> before executing anything.</div>
+      </div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Phase types</div>
+        <div class="campaign-block-body">Campaigns break into 3–8 ordered phases: <strong style="color:var(--text)">research</strong> → <strong style="color:var(--text)">plan</strong> → <strong style="color:var(--text)">build</strong> → <strong style="color:var(--text)">wire</strong> → <strong style="color:var(--text)">verify</strong> → <strong style="color:var(--text)">prune</strong>. Each has machine-verifiable end conditions (file exists, command passes, metric threshold) — a phase isn't marked complete until they pass.</div>
+      </div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Self-correction (automatic)</div>
+        <div class="campaign-block-body">
+          · <strong style="color:var(--text)">Direction alignment</strong> every 2 phases — catches scope drift before it compounds<br>
+          · <strong style="color:var(--text)">Quality spot-check</strong> every phase — reads the most significant output, verifies it meets the project's bar<br>
+          · <strong style="color:var(--text)">Regression guard</strong> after build phases — runs typecheck, escalates on 5+ new errors<br>
+          · <strong style="color:var(--text)">Anti-pattern scan</strong> — catches transition-all, confirm(), missing Escape handlers
+        </div>
+      </div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Resuming across sessions</div>
+        <div class="campaign-block-body">Run <code>/do continue</code> or <code>/archon</code> with no arguments. The SessionStart hook restores context. Archon reads the campaign's Active Context section and picks up at the exact sub-step.</div>
+      </div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Archon vs Fleet</div>
+        <div class="campaign-block-body"><strong style="color:var(--orange)">Archon</strong> — sequential phases, one agent per phase. Best for complex single-domain work.<br><br><strong style="color:var(--purple)">Fleet</strong> — parallel agents in isolated worktrees, 2–3 per wave. Best for platform-wide work where phases are independent. <code>/do</code> routes to Fleet automatically when it detects platform-wide scope.</div>
+      </div>
+      <div class="campaign-block">
+        <div class="campaign-block-title">Circuit breakers</div>
+        <div class="campaign-block-body">Campaigns park automatically when: 3+ consecutive failures on the same approach · 5+ new type errors in a single phase · direction drift detected twice in a row · quality bar fails 3 times. You get a clear status and a decision point.</div>
       </div>
     </div>
   </div>
@@ -1004,6 +1274,38 @@
 
     // Auto-demo on load
     setTimeout(() => animateRoute('review the auth module'), 700);
+
+    // ─── Side panels ──────────────────────────────────────────────────────
+    let activePanel = null;
+
+    function openPanel(name) {
+      if (activePanel === name) { closePanel(); return; }
+      if (activePanel) {
+        document.getElementById(`panel-${activePanel}`).classList.remove('open');
+        document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('panel-active'));
+      }
+      activePanel = name;
+      document.getElementById('panel-backdrop').classList.add('open');
+      document.getElementById(`panel-${name}`).classList.add('open');
+      const btn = [...document.querySelectorAll('.nav-link')].find(
+        el => el.getAttribute('onclick') === `openPanel('${name}')`
+      );
+      if (btn) btn.classList.add('panel-active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closePanel() {
+      if (!activePanel) return;
+      document.getElementById('panel-backdrop').classList.remove('open');
+      document.getElementById(`panel-${activePanel}`).classList.remove('open');
+      document.querySelectorAll('.nav-link').forEach(el => el.classList.remove('panel-active'));
+      document.body.style.overflow = '';
+      activePanel = null;
+    }
+
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && activePanel) { closePanel(); e.stopPropagation(); }
+    });
   </script>
 </body>
 </html>
