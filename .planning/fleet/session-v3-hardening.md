@@ -1,6 +1,6 @@
 # Fleet Session: v3-hardening
 
-Status: active
+Status: completed
 Started: 2026-03-27T00:00:00Z
 Direction: V3 hardening — unified telemetry schema + token economics, YAML frontmatter on state files, health endpoint, structured hook output (CITADEL_UI mode), auto-sweep + version-gated copying in init-project, glob support in protect-files, campaign lifecycle integration test.
 
