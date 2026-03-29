@@ -145,9 +145,139 @@ function main() {
       PLUGIN_ROOT
     );
 
+    // 7. Watchdog — check for stale command results from a previous session
+    checkStaleCommandResult();
+
+    // 8. Daemon bootstrap — detect active daemon and prompt continuation
+    checkDaemonState();
+
   } catch (err) {
     // Non-fatal — don't block session start
     process.exit(0);
+  }
+}
+
+/**
+ * Watchdog: check for stale command results from a previous session.
+ *
+ * If last-command-result.json exists and is older than 10 minutes,
+ * the previous session may have completed a command that wasn't seen.
+ * Surface it so the user knows what happened.
+ */
+function checkStaleCommandResult() {
+  try {
+    const resultPath = path.join(PROJECT_ROOT, '.planning', 'telemetry', 'last-command-result.json');
+    if (!fs.existsSync(resultPath)) return;
+
+    const result = JSON.parse(fs.readFileSync(resultPath, 'utf8'));
+    if (!result.timestamp) return;
+
+    const ageMs = Date.now() - new Date(result.timestamp).getTime();
+    const STALE_THRESHOLD = 10 * 60 * 1000; // 10 minutes
+
+    if (ageMs > STALE_THRESHOLD) {
+      const ageMins = Math.round(ageMs / 60000);
+      const exitCode = result.exitCode !== null && result.exitCode !== undefined ? result.exitCode : 'unknown';
+      const duration = result.durationSec || '?';
+      const cmd = (result.command || 'unknown').slice(0, 100);
+
+      const parts = [`[watchdog] A previous command completed ${ageMins}m ago but may not have been seen.`];
+      parts.push(`  Command: ${cmd}`);
+      parts.push(`  Exit code: ${exitCode}, duration: ${duration}s`);
+
+      if (result.timedOut) {
+        parts.push(`  NOTE: This command was killed by timeout after ${result.timeoutLimit}s.`);
+      }
+
+      parts.push(`  Check .planning/telemetry/last-command-result.json for details.`);
+
+      process.stdout.write(parts.join('\n') + '\n');
+
+      // Clean up so we don't warn again
+      fs.unlinkSync(resultPath);
+    }
+  } catch {
+    // Non-fatal — don't block session start
+  }
+}
+
+/**
+ * Daemon bridge: if a daemon is running, notify the user.
+ *
+ * Interactive sessions (user at the keyboard) get a notification only --
+ * no tokens spent without explicit intent. The user runs /do continue.
+ *
+ * Non-interactive sessions (claude -p, RemoteTrigger, cron) get a command
+ * the agent acts on automatically -- that's the overnight-factory use case.
+ */
+function checkDaemonState() {
+  try {
+    const daemonPath = path.join(PROJECT_ROOT, '.planning', 'daemon.json');
+    if (!fs.existsSync(daemonPath)) return;
+
+    const daemon = JSON.parse(fs.readFileSync(daemonPath, 'utf8'));
+
+    // Only bootstrap if daemon is actively running
+    if (daemon.status !== 'running') return;
+
+    // Lock check: if another session is active (lastTickAt within 2 min), don't overlap
+    if (daemon.lastTickAt && daemon.lastTickStatus === 'running') {
+      const elapsed = Date.now() - new Date(daemon.lastTickAt).getTime();
+      if (elapsed < 120000) return; // another session is working
+    }
+
+    // Budget check: don't start if budget exhausted
+    if (typeof daemon.budget === 'number' && daemon.estimatedSpend >= daemon.budget) return;
+
+    // Campaign check: verify campaign is still active
+    const slug = daemon.campaignSlug;
+    if (!slug) return;
+    const campaignPath = path.join(PROJECT_ROOT, '.planning', 'campaigns', `${slug}.md`);
+    const campaignExists = fs.existsSync(campaignPath);
+    const campaignActive = campaignExists
+      && /status:\s*active/i.test(fs.readFileSync(campaignPath, 'utf8'));
+
+    if (!campaignActive) {
+      // Campaign is done but daemon.json still says running -- stop the daemon.
+      // This prevents idle loops where sessions spawn, find no work, and exit.
+      try {
+        daemon.status = 'stopped';
+        daemon.stoppedAt = new Date().toISOString();
+        daemon.stopReason = 'no-active-work';
+        fs.writeFileSync(daemonPath, JSON.stringify(daemon, null, 2));
+        process.stdout.write(
+          `[daemon] Stopped -- campaign "${slug}" is no longer active. ` +
+          `Reason: ${campaignExists ? 'campaign completed/parked' : 'campaign file not found'}.\n`
+        );
+      } catch { /* non-fatal */ }
+      return;
+    }
+
+    // All gates pass -- determine session type
+    const remaining = typeof daemon.budget === 'number'
+      ? ` Budget: $${daemon.estimatedSpend}/$${daemon.budget}.`
+      : '';
+    const sessions = daemon.sessionCount || 0;
+
+    // Non-interactive: CLAUDE_NON_INTERACTIVE env var set by the scheduled task script.
+    // Auto-execute is appropriate here (cron, RemoteTrigger, overnight factory).
+    // Note: process.argv won't contain parent's -p flag -- hooks are child processes.
+    const isNonInteractive = process.env.CLAUDE_NON_INTERACTIVE === '1';
+
+    if (isNonInteractive) {
+      process.stdout.write(
+        `[daemon] Active campaign: ${slug} (session #${sessions + 1}).${remaining}\n` +
+        `Run: /do continue\n`
+      );
+    } else {
+      // Interactive: notify only. No tokens spent without explicit intent.
+      process.stdout.write(
+        `[daemon] Active campaign: ${slug} (loop ${daemon.log ? daemon.log.length + 1 : '?'} pending)${remaining}\n` +
+        `  Run /do continue to resume, or /daemon stop to cancel.\n`
+      );
+    }
+  } catch {
+    // Non-fatal — if daemon state is corrupt, don't block session start
   }
 }
 
