@@ -6,8 +6,8 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { parseProjectSpec, validateProjectSpec } = require(path.join(__dirname, '..', 'core', 'project', 'load-project-spec'));
-const { renderCodexGuidance } = require(path.join(__dirname, '..', 'core', 'project', 'render-codex-guidance'));
 const { CLAUDE_GUIDANCE_TARGET, renderClaudeGuidance } = require(path.join(__dirname, '..', 'runtimes', 'claude-code', 'guidance', 'render'));
+const { CODEX_GUIDANCE_TARGET, renderCodexGuidance } = require(path.join(__dirname, '..', 'runtimes', 'codex', 'guidance', 'render'));
 
 function fail(message) {
   console.error(message);
@@ -34,6 +34,9 @@ function main() {
   }
   if (!codex.includes('## Citadel Project Guidance')) {
     fail('Codex guidance renderer must emit the Citadel Project Guidance section');
+  }
+  if (CODEX_GUIDANCE_TARGET.filePath !== 'AGENTS.md') {
+    fail('Codex runtime guidance target must point to AGENTS.md');
   }
 
   const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'citadel-project-guidance-'));

@@ -5,8 +5,8 @@
 const fs = require('fs');
 const path = require('path');
 const { loadProjectSpec } = require(path.join(__dirname, '..', 'core', 'project', 'load-project-spec'));
-const { renderCodexGuidance } = require(path.join(__dirname, '..', 'core', 'project', 'render-codex-guidance'));
 const { CLAUDE_GUIDANCE_TARGET } = require(path.join(__dirname, '..', 'runtimes', 'claude-code', 'guidance', 'render'));
+const { CODEX_GUIDANCE_TARGET } = require(path.join(__dirname, '..', 'runtimes', 'codex', 'guidance', 'render'));
 
 function parseArgs(argv) {
   const args = {
@@ -36,8 +36,8 @@ function buildTargets(spec) {
       content: CLAUDE_GUIDANCE_TARGET.render(spec),
     },
     codex: {
-      filePath: 'AGENTS.md',
-      content: renderCodexGuidance(spec),
+      filePath: CODEX_GUIDANCE_TARGET.filePath,
+      content: CODEX_GUIDANCE_TARGET.render(spec),
     },
   };
 }

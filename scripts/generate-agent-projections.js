@@ -2,9 +2,8 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
-const { projectAgentToCodex } = require(path.join(__dirname, '..', 'core', 'agents', 'project-agent'));
+const { projectCodexAgents } = require(path.join(__dirname, '..', 'runtimes', 'codex', 'generators', 'project-agents'));
 
 const CITADEL_ROOT = path.resolve(__dirname, '..');
 
@@ -20,16 +19,14 @@ function parseArgs(argv) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const sourceBase = path.join(CITADEL_ROOT, 'agents');
-  const targetBase = path.join(args.projectRoot, '.codex', 'agents');
+  const results = projectCodexAgents({
+    citadelRoot: CITADEL_ROOT,
+    projectRoot: args.projectRoot,
+    agentName: args.agentName,
+    dryRun: args.dryRun,
+  });
 
-  const agentFiles = args.agentName
-    ? [`${args.agentName}.md`]
-    : fs.readdirSync(sourceBase).filter((name) => name.endsWith('.md'));
-
-  for (const agentFile of agentFiles) {
-    const agentPath = path.join(sourceBase, agentFile);
-    const result = projectAgentToCodex(agentPath, targetBase, { dryRun: args.dryRun });
+  for (const result of results) {
     const verb = args.dryRun ? 'would project' : 'projected';
     console.log(`[${verb}] ${result.parsedAgent.frontmatter.name || result.parsedAgent.name}`);
   }

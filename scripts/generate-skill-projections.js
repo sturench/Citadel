@@ -2,9 +2,8 @@
 
 'use strict';
 
-const fs = require('fs');
 const path = require('path');
-const { projectSkillToCodex } = require(path.join(__dirname, '..', 'core', 'skills', 'project-skill'));
+const { projectCodexSkills } = require(path.join(__dirname, '..', 'runtimes', 'codex', 'generators', 'project-skills'));
 
 const CITADEL_ROOT = path.resolve(__dirname, '..');
 
@@ -20,16 +19,14 @@ function parseArgs(argv) {
 
 function main() {
   const args = parseArgs(process.argv.slice(2));
-  const sourceBase = path.join(CITADEL_ROOT, 'skills');
-  const targetBase = path.join(args.projectRoot, '.agents', 'skills');
+  const results = projectCodexSkills({
+    citadelRoot: CITADEL_ROOT,
+    projectRoot: args.projectRoot,
+    skillName: args.skillName,
+    dryRun: args.dryRun,
+  });
 
-  const skillNames = args.skillName
-    ? [args.skillName]
-    : fs.readdirSync(sourceBase).filter((name) => fs.existsSync(path.join(sourceBase, name, 'SKILL.md')));
-
-  for (const skillName of skillNames) {
-    const sourceDir = path.join(sourceBase, skillName);
-    const result = projectSkillToCodex(sourceDir, targetBase, skillName, { dryRun: args.dryRun });
+  for (const result of results) {
     const verb = args.dryRun ? 'would project' : 'projected';
     console.log(`[${verb}] ${result.skillName}`);
   }
